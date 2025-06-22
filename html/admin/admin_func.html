@@ -247,7 +247,7 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="admins-tbody">
                                 <tr>
                                     <td>Admin User</td>
                                     <td>admin@college.edu</td>
@@ -344,6 +344,7 @@
             });
         });
 
+        //cancel admin creation
         document.getElementById('create-admin-cancel').addEventListener('click', () => {
             const form = document.getElementById('create-admin-form');
             form.style.display = 'none';
@@ -381,6 +382,7 @@
                     const form = document.getElementById('create-admin-form');
                     form.style.display = 'none';
                     form.reset();
+                    loadAdmins();
                 } else {
                     alert(data.error || 'Error creating admin');
                 }
@@ -388,6 +390,41 @@
                 alert('Server error');
             }
         });
+
+        // Function to render admins
+        async function loadAdmins() {
+            const tbody = document.getElementById('admins-tbody');
+            tbody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
+            try {
+                const res = await fetch('http://localhost:3000/admins');
+                const admins = await res.json();
+                if (admins.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4">No admins found.</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = admins.map(admin => `
+                    <tr>
+                        <td>${admin.name}</td>
+                        <td>${admin.email}</td>
+                        <td><span class="role-badge admin">Admin</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn edit" title="Edit" data-email="${admin.email}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete" title="Delete" data-email="${admin.email}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="4">Failed to load admins.</td></tr>';
+            }
+        }
+        // Call loadAdmins on page load and after creating an admin
+        document.addEventListener('DOMContentLoaded', loadAdmins);
     </script>
 </body>
 </html>

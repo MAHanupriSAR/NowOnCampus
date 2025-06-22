@@ -121,6 +121,17 @@ app.post('/createAdmin', async (req, res) => {
   }
 }); 
 
+app.get('/admins', async (req, res) => {
+  try {
+    const [admins] = await db.promise().query(
+      'SELECT id, name, email FROM users WHERE isAdmin = 1'
+    );
+    res.json(admins);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch admins' });
+  }
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
