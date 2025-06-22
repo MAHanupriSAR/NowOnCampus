@@ -671,16 +671,44 @@
         // Set initial button text
         filterBtn.innerHTML = `<i class="fas fa-filter"></i> ${filterNames[currentEventFilter]} <i class="fas fa-caret-down"></i>`;
 
-
         // Function to render events
         async function loadEvents() {
             const tbody = document.getElementById('events-tbody');
-            tbody.innerHTML = '<tr><td colspan="6">Loading...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
             try {
                 const res = await fetch('http://localhost:3000/events');
-                const events = await res.json();
+                let events = await res.json();
+                if (!Array.isArray(events)) events = [];
+
+                // Filter events according to currentEventFilter
+                if (currentEventFilter !== 'all') {
+                    events = events.filter(event => {
+                        // If your DB has event_status, use it directly:
+                        if (event.event_status) {
+                            return event.event_status === currentEventFilter;
+                        }
+                        // Fallback: calculate status on frontend
+                        const now = new Date();
+                        const start = new Date(event.start_datetime);
+                        const end = new Date(event.end_datetime);
+                        if (currentEventFilter === 'upcoming') {
+                            return start > now;
+                        }
+                        if (currentEventFilter === 'ongoing') {
+                            return start <= now && end >= now;
+                        }
+                        if (currentEventFilter === 'past') {
+                            return end < now;
+                        }
+                        if (currentEventFilter === 'cancelled') {
+                            return event.event_status === 'cancelled';
+                        }
+                        return true;
+                    });
+                }
+
                 if (events.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6">No events found.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7">No events found.</td></tr>';
                     return;
                 }
                 tbody.innerHTML = events.map(event => {
@@ -689,6 +717,13 @@
                     const end = new Date(event.end_datetime);
                     const dateStr = `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
                     const timeStr = `${start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${end.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                    // Status badge
+                    let status = event.event_status || 'open';
+                    let statusClass = 'open';
+                    if (status === 'upcoming') statusClass = 'upcoming';
+                    else if (status === 'ongoing') statusClass = 'ongoing';
+                    else if (status === 'past') statusClass = 'past';
+                    else if (status === 'cancelled') statusClass = 'cancelled';
                     return `
                         <tr>
                             <td>
@@ -705,13 +740,13 @@
                             <td>${event.venue}</td>
                             <td>${event.capacity}</td>
                             <td>${event.registrations}</td>
-                            <td><span class="status-badge open">Open</span></td>
+                            <td><span class="status-badge ${statusClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</span></td>
                             <td>
                                 <div class="action-buttons">
                                     <button class="action-btn edit" title="Edit" data-id="${event.event_id}">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="action-btn delete" title="" data-id="${event.event_id}">
+                                    <button class="action-btn delete" title="cancel" data-id="${event.event_id}">
                                         <i class="fas fa-times-circle"></i>
                                     </button>
                                     <button class="action-btn delete" title="Delete" data-id="${event.event_id}">
@@ -723,10 +758,10 @@
                     `;
                 }).join('');
             } catch (err) {
-                tbody.innerHTML = '<tr><td colspan="6">Failed to load events.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7">Failed to load events.</td></tr>';
             }
         }
-
+        
         // Call loadEvents on page load and after creating an event
         document.addEventListener('DOMContentLoaded', loadEvents);
     </script>
