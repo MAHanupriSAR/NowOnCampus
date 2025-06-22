@@ -234,7 +234,8 @@
                         <label>Email: <input type="email" id="admin-email" required></label>
                         <label>Password: <input type="password" id="admin-password" required></label>
                         <label>Confirm: <input type="password" id="admin-confirm" required></label>
-                        <button class="btn" id="create-admin-submit">Submit</button>
+                        <button class="btn" id="create-admin-submit" type="submit">Submit</button>
+                        <button class="btn" id="create-admin-cancel" type="button">Cancel</button>
                     </form>
                     <div class="table-container">
                         <table class="data-table">
@@ -343,6 +344,11 @@
             });
         });
 
+        document.getElementById('create-admin-cancel').addEventListener('click', () => {
+            const form = document.getElementById('create-admin-form');
+            form.style.display = 'none';
+            form.reset();
+        }); 
         // Toggle Create Admin form
         document.getElementById('btn-create-admin').addEventListener('click', () => {
             const form = document.getElementById('create-admin-form');
@@ -372,6 +378,9 @@
                 if (response.ok) {
                     alert(data.message);
                     // Reload or fetch updated list
+                    const form = document.getElementById('create-admin-form');
+                    form.style.display = 'none';
+                    form.reset();
                 } else {
                     alert(data.error || 'Error creating admin');
                 }
