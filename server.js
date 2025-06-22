@@ -132,6 +132,21 @@ app.get('/admins', async (req, res) => {
   }
 });
 
+app.post('/updateAdminPassword', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    await db.promise().query(
+      'UPDATE users SET password = ? WHERE email = ? AND isAdmin = 1',
+      [hashedPassword, email]
+    );
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Update password error:', error);
+    res.status(500).json({ error: 'Failed to update password' });
+  }
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
