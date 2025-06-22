@@ -235,6 +235,16 @@ app.post('/createEvent', async (req, res) => {
   }
 });
 
+app.get('/events', async (req, res) => {
+  try {
+    const [events] = await db.promise().query(
+      'SELECT * FROM events ORDER BY start_datetime DESC'
+    );
+    res.json(events);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch events' });
+  }
+});
 
 const PORT = 3000;
 app.listen(PORT, () => {
