@@ -60,17 +60,8 @@
                         <i class="fas fa-calendar-alt"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-number">2</div>
+                        <div class="stat-number" id="stat-total-events">0</div>
                         <div class="stat-label">Total Events</div>
-                    </div>
-                </div>
-                <div class="stat-card green">
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number">214</div>
-                        <div class="stat-label">Total Registrations</div>
                     </div>
                 </div>
                 <div class="stat-card purple">
@@ -78,7 +69,7 @@
                         <i class="fas fa-cog"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-number">2</div>
+                        <div class="stat-number" id="stat-active-events">0</div>
                         <div class="stat-label">Active Events</div>
                     </div>
                 </div>
@@ -87,7 +78,7 @@
                         <i class="fas fa-user-shield"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-number">1</div>
+                        <div class="stat-number" id="stat-total-admins">0</div>
                         <div class="stat-label">Total Admins</div>
                     </div>
                 </div>
@@ -96,7 +87,7 @@
                         <i class="fas fa-user-graduate"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-number">1</div>
+                        <div class="stat-number" id="stat-total-students">0</div>
                         <div class="stat-label">Total Students</div>
                     </div>
                 </div>
@@ -869,6 +860,7 @@
                     document.getElementById('edit-event-agenda').value = event.agenda || '';
                     document.getElementById('edit-event-description').value = event.description || '';
                     document.getElementById('edit-event-modal').style.display = 'flex';
+                    document.getElementById('edit-event-status').value = event.event_status || 'upcoming';
                 } catch (err) {
                     alert('Server error');
                 }
@@ -933,8 +925,21 @@
                 alert('Server error');
             }
         });
-
-        document.getElementById('edit-event-status').value = event.event_status || 'upcoming';
+        
+        // Fetch and display statistics
+        async function loadStats() {
+            try {
+                const res = await fetch('http://localhost:3000/adminStats');
+                const stats = await res.json();
+                document.getElementById('stat-total-events').textContent = stats.totalEvents ?? 0;
+                document.getElementById('stat-active-events').textContent = stats.activeEvents ?? 0;
+                document.getElementById('stat-total-admins').textContent = stats.totalAdmins ?? 0;
+                document.getElementById('stat-total-students').textContent = stats.totalStudents ?? 0;
+            } catch (err) {
+                // Optionally handle error
+            }
+        }
+        document.addEventListener('DOMContentLoaded', loadStats);
     </script>
 </body>
 </html>

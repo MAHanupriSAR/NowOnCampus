@@ -323,6 +323,18 @@ app.post('/updateEvent', async (req, res) => {
   }
 });
 
+app.get('/adminStats', async (req, res) => {
+  try {
+    const [[{ totalEvents }]] = await db.promise().query('SELECT COUNT(*) AS totalEvents FROM events');
+    const [[{ activeEvents }]] = await db.promise().query('SELECT COUNT(*) AS activeEvents FROM events WHERE event_status IN ("upcoming", "ongoing")');
+    const [[{ totalAdmins }]] = await db.promise().query('SELECT COUNT(*) AS totalAdmins FROM users WHERE isAdmin = 1');
+    const [[{ totalStudents }]] = await db.promise().query('SELECT COUNT(*) AS totalStudents FROM users WHERE isAdmin = 0');
+    res.json({ totalEvents, activeEvents, totalAdmins, totalStudents });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch statistics' });
+  }
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
