@@ -147,6 +147,20 @@ app.post('/updateAdminPassword', async (req, res) => {
   }
 });
 
+app.post('/deleteAdmin', async (req, res) => {
+  const { email } = req.body;
+  try {
+    await db.promise().query(
+      'DELETE FROM users WHERE email = ? AND isAdmin = 1',
+      [email]
+    );
+    res.json({ message: 'Admin deleted successfully' });
+  } catch (error) {
+    console.error('Delete admin error:', error);
+    res.status(500).json({ error: 'Failed to delete admin' });
+  }
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
