@@ -192,6 +192,20 @@ app.post('/updateStudentPassword', async (req, res) => {
   }
 });
 
+app.post('/deleteStudent', async (req, res) => {
+  const { email } = req.body;
+  try {
+    await db.promise().query(
+      'DELETE FROM users WHERE email = ? AND isAdmin = 0',
+      [email]
+    );
+    res.json({ message: 'Student deleted successfully' });
+  } catch (error) {
+    console.error('Delete student error:', error);
+    res.status(500).json({ error: 'Failed to delete student' });
+  }
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
