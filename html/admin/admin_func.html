@@ -309,6 +309,13 @@
                             </tbody>
                         </table>
                     </div>
+                    <form id="edit-student-password-form" style="display:none; margin-bottom:1rem;">
+                        <input type="hidden" id="edit-student-email">
+                        <label>New Password: <input type="password" id="edit-student-password" required></label>
+                        <label>Confirm Password: <input type="password" id="edit-student-confirm" required></label>
+                        <button class="btn" id="edit-student-password-submit" type="submit">Update</button>
+                        <button class="btn" id="edit-student-password-cancel" type="button">Cancel</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -523,9 +530,57 @@
                 tbody.innerHTML = '<tr><td colspan="4">Failed to load students.</td></tr>';
             }
         }
-
         // Call loadStudents on page load
         document.addEventListener('DOMContentLoaded', loadStudents);
+
+        // Show edit password form when edit button is clicked for students
+        document.getElementById('students-tbody').addEventListener('click', function(e) {
+            if (e.target.closest('.action-btn.edit')) {
+                const btn = e.target.closest('.action-btn.edit');
+                const email = btn.getAttribute('data-email');
+                document.getElementById('edit-student-email').value = email;
+                document.getElementById('edit-student-password-form').style.display = 'block';
+            }
+        });
+
+        // Cancel button for edit student password form
+        document.getElementById('edit-student-password-cancel').addEventListener('click', () => {
+            const form = document.getElementById('edit-student-password-form');
+            form.style.display = 'none';
+            form.reset();
+        });
+
+        // Handle edit student password form submission
+        document.getElementById('edit-student-password-submit').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('edit-student-email').value;
+            const password = document.getElementById('edit-student-password').value;
+            const confirm = document.getElementById('edit-student-confirm').value;
+
+            if (password !== confirm) {
+                alert('Passwords do not match.');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/updateStudentPassword', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.message);
+                    const form = document.getElementById('edit-student-password-form');
+                    form.style.display = 'none';
+                    form.reset();
+                } else {
+                    alert(data.error || 'Error updating password');
+                }
+            } catch (err) {
+                alert('Server error');
+            }
+        });
 
     </script>
 </body>

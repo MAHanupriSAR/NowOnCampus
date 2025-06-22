@@ -177,7 +177,20 @@ app.get('/students', async (req, res) => {
   }
 });
 
-
+app.post('/updateStudentPassword', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    await db.promise().query(
+      'UPDATE users SET password = ? WHERE email = ? AND isAdmin = 0',
+      [hashedPassword, email]
+    );
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Update student password error:', error);
+    res.status(500).json({ error: 'Failed to update password' });
+  }
+});
 
 const PORT = 3000;
 app.listen(PORT, () => {
