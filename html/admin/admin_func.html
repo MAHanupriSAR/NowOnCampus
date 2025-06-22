@@ -290,16 +290,13 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="students-tbody">
                                 <tr>
                                     <td>Student User</td>
                                     <td>student@college.edu</td>
                                     <td><span class="role-badge student">Student</span></td>
                                     <td>
                                         <div class="action-buttons">
-                                            <button class="action-btn view" title="View">
-                                                <i class="fas fa-external-link-alt"></i>
-                                            </button>
                                             <button class="action-btn edit" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </button>
@@ -333,6 +330,8 @@
             });
         });
 
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //Admin management
         // Show edit password form when edit button is clicked
         document.getElementById('admins-tbody').addEventListener('click', function(e) {
             if (e.target.closest('.action-btn.edit')) {
@@ -489,6 +488,45 @@
         }
         // Call loadAdmins on page load and after creating an admin
         document.addEventListener('DOMContentLoaded', loadAdmins);
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////
+        //student management
+        // Function to render students
+        async function loadStudents() {
+            const tbody = document.getElementById('students-tbody');
+            tbody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
+            try {
+                const res = await fetch('http://localhost:3000/students');
+                const students = await res.json();
+                if (students.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4">No students found.</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = students.map(student => `
+                    <tr>
+                        <td>${student.name}</td>
+                        <td>${student.email}</td>
+                        <td><span class="role-badge student">Student</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn edit" title="Edit" data-email="${student.email}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete" title="Delete" data-email="${student.email}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                tbody.innerHTML = '<tr><td colspan="4">Failed to load students.</td></tr>';
+            }
+        }
+
+        // Call loadStudents on page load
+        document.addEventListener('DOMContentLoaded', loadStudents);
+
     </script>
 </body>
 </html>

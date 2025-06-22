@@ -24,6 +24,7 @@ db.connect(err => {
   console.log('Connected to database.');
 });
 
+//////////////////////////////////////////////////////////////////////////////////////////////
 // Signup endpoint
 app.post('/signup', async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
@@ -98,6 +99,8 @@ app.post('/login', async (req, res) => {
   }
 });
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//Admin Management
 // Create Admin endpoint
 app.post('/createAdmin', async (req, res) => {
   const { name, email, password } = req.body;
@@ -160,6 +163,21 @@ app.post('/deleteAdmin', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete admin' });
   }
 });
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//student management
+app.get('/students', async (req, res) => {
+  try {
+    const [students] = await db.promise().query(
+      'SELECT id, name, email FROM users WHERE isAdmin = 0'
+    );
+    res.json(students);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch students' });
+  }
+});
+
+
 
 const PORT = 3000;
 app.listen(PORT, () => {
