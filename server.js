@@ -284,6 +284,45 @@ app.post('/deleteEvent', async (req, res) => {
   }
 });
 
+app.get('/event/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await db.promise().query('SELECT * FROM events WHERE event_id = ?', [id]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Event not found' });
+    res.json(rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch event' });
+  }
+});
+
+app.post('/updateEvent', async (req, res) => {
+  const {
+    event_id,
+    event_name,
+    start_datetime,
+    end_datetime,
+    venue,
+    event_type,
+    department,
+    capacity,
+    organiser_name,
+    agenda,
+    description,
+    event_status // get from request
+  } = req.body;
+  try {
+    await db.promise().query(
+      `UPDATE events SET 
+        event_name = ?, start_datetime = ?, end_datetime = ?, venue = ?, event_type = ?, department = ?, capacity = ?, organiser_name = ?, agenda = ?, description = ?, event_status = ?
+       WHERE event_id = ?`,
+      [event_name, start_datetime, end_datetime, venue, event_type, department, capacity, organiser_name, agenda, description, event_status, event_id]
+    );
+    res.json({ message: 'Event updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update event' });
+  }
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

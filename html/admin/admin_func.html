@@ -179,6 +179,35 @@
                             <button class="btn" id="create-event-cancel" type="button">Cancel</button>
                         </form>
                     </div>
+                    <!-- Edit Event Popup Form -->
+                    <div id="edit-event-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); z-index:1000; align-items:center; justify-content:center;">
+                        <form id="edit-event-form" style="background:#fff; padding:2rem; border-radius:8px; max-width:400px; margin:auto; position:relative;">
+                            <h3>Edit Event</h3>
+                            <input type="hidden" id="edit-event-id">
+                            <label>Event Name: <input type="text" id="edit-event-name" required></label><br>
+                            <label>Start Date: <input type="date" id="edit-event-start-date" required></label><br>
+                            <label>End Date: <input type="date" id="edit-event-end-date" required></label><br>
+                            <label>Start Time: <input type="time" id="edit-event-start-time" required></label><br>
+                            <label>End Time: <input type="time" id="edit-event-end-time" required></label><br>
+                            <label>Venue: <input type="text" id="edit-event-venue" required></label><br>
+                            <label>Type: <input type="text" id="edit-event-type" placeholder="unlisted"></label><br>
+                            <label>Department: <input type="text" id="edit-event-department"></label><br>
+                            <label>Capacity: <input type="number" id="edit-event-capacity" required min="1"></label><br>
+                            <label>Organiser Name: <input type="text" id="edit-event-organiser"></label><br>
+                            <label>Agenda: <input type="text" id="edit-event-agenda"></label><br>
+                            <label>Description: <textarea id="edit-event-description" required></textarea></label><br>
+                            <button class="btn" id="edit-event-submit" type="submit">Update</button>
+                            <button class="btn" id="edit-event-cancel" type="button">Cancel</button>
+                            <label>Status:
+                                <select id="edit-event-status" required>
+                                    <option value="upcoming">Upcoming</option>
+                                    <option value="ongoing">Ongoing</option>
+                                    <option value="past">Past</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </label><br>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- Admin Management Tab -->
@@ -813,6 +842,99 @@
                 }
             }
         });
+        // Show edit event modal and populate fields
+        document.getElementById('events-tbody').addEventListener('click', async function(e) {
+            if (e.target.closest('.action-btn.edit')) {
+                const btn = e.target.closest('.action-btn.edit');
+                const event_id = btn.getAttribute('data-id');
+                // Fetch event details from backend
+                try {
+                    const res = await fetch(`http://localhost:3000/event/${event_id}`);
+                    const event = await res.json();
+                    if (!event || !event.event_id) {
+                        alert('Failed to fetch event details');
+                        return;
+                    }
+                    document.getElementById('edit-event-id').value = event.event_id;
+                    document.getElementById('edit-event-name').value = event.event_name;
+                    document.getElementById('edit-event-start-date').value = event.start_datetime.slice(0,10);
+                    document.getElementById('edit-event-end-date').value = event.end_datetime.slice(0,10);
+                    document.getElementById('edit-event-start-time').value = event.start_datetime.slice(11,16);
+                    document.getElementById('edit-event-end-time').value = event.end_datetime.slice(11,16);
+                    document.getElementById('edit-event-venue').value = event.venue;
+                    document.getElementById('edit-event-type').value = event.event_type || '';
+                    document.getElementById('edit-event-department').value = event.department || '';
+                    document.getElementById('edit-event-capacity').value = event.capacity;
+                    document.getElementById('edit-event-organiser').value = event.organiser_name || '';
+                    document.getElementById('edit-event-agenda').value = event.agenda || '';
+                    document.getElementById('edit-event-description').value = event.description || '';
+                    document.getElementById('edit-event-modal').style.display = 'flex';
+                } catch (err) {
+                    alert('Server error');
+                }
+            }
+        });
+
+        // Hide edit modal on cancel
+        document.getElementById('edit-event-cancel').addEventListener('click', () => {
+            document.getElementById('edit-event-modal').style.display = 'none';
+            document.getElementById('edit-event-form').reset();
+        });
+
+        // Handle edit event form submission
+        document.getElementById('edit-event-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const event_id = document.getElementById('edit-event-id').value;
+            const event_name = document.getElementById('edit-event-name').value.trim();
+            const start_date = document.getElementById('edit-event-start-date').value;
+            const end_date = document.getElementById('edit-event-end-date').value;
+            const start_time = document.getElementById('edit-event-start-time').value;
+            const end_time = document.getElementById('edit-event-end-time').value;
+            const venue = document.getElementById('edit-event-venue').value.trim();
+            const event_type = document.getElementById('edit-event-type').value.trim() || 'unlisted';
+            const department = document.getElementById('edit-event-department').value.trim();
+            const capacity = document.getElementById('edit-event-capacity').value;
+            const organiser_name = document.getElementById('edit-event-organiser').value.trim();
+            const agenda = document.getElementById('edit-event-agenda').value.trim();
+            const description = document.getElementById('edit-event-description').value.trim();
+            const event_status = document.getElementById('edit-event-status').value;
+            const start_datetime = `${start_date}T${start_time}`;
+            const end_datetime = `${end_date}T${end_time}`;
+
+            try {
+                const response = await fetch('http://localhost:3000/updateEvent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        event_id,
+                        event_name,
+                        start_datetime,
+                        end_datetime,
+                        venue,
+                        event_type,
+                        department,
+                        capacity,
+                        organiser_name,
+                        agenda,
+                        description,
+                        event_status
+                    })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.message);
+                    document.getElementById('edit-event-modal').style.display = 'none';
+                    document.getElementById('edit-event-form').reset();
+                    loadEvents();
+                } else {
+                    alert(data.error || 'Error updating event');
+                }
+            } catch (err) {
+                alert('Server error');
+            }
+        });
+
+        document.getElementById('edit-event-status').value = event.event_status || 'upcoming';
     </script>
 </body>
 </html>
