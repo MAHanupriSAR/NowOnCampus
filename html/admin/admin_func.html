@@ -122,8 +122,20 @@
             <div class="tab-content">
                 <!-- Event Management Tab -->
                 <div class="tab-pane active" id="events-tab">
-                    <div class="section-header">
+                    <div class="section-header" style="display: flex; align-items: center; gap: 1rem;">
                         <h2 class="section-title">Event Management</h2>
+                        <div class="dropdown" style="position: relative;">
+                            <button class="btn" id="event-filter-btn" type="button">
+                                <i class="fas fa-filter"></i> Filter Events <i class="fas fa-caret-down"></i>
+                            </button>
+                            <div id="event-filter-menu" style="display:none; position:absolute; top:110%; left:0; background:#fff; border:1px solid #ccc; border-radius:4px; min-width:160px; z-index:10;">
+                                <button class="dropdown-item" data-filter="all" style="width:100%;text-align:left;padding:8px;border:none;background:none;">All</button>
+                                <button class="dropdown-item" data-filter="upcoming" style="width:100%;text-align:left;padding:8px;border:none;background:none;">Upcoming</button>
+                                <button class="dropdown-item" data-filter="ongoing" style="width:100%;text-align:left;padding:8px;border:none;background:none;">Ongoing</button>
+                                <button class="dropdown-item" data-filter="past" style="width:100%;text-align:left;padding:8px;border:none;background:none;">Past</button>
+                                <button class="dropdown-item" data-filter="cancelled" style="width:100%;text-align:left;padding:8px;border:none;background:none;">Cancelled</button>
+                            </div>
+                        </div>
                         <button class="btn btn-create">
                             <i class="fas fa-plus btn-icon"></i>
                             Create Event
@@ -138,6 +150,7 @@
                                     <th>Location</th>
                                     <th>Capacity</th>
                                     <th>Registrations</th>
+                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -623,6 +636,42 @@
             }
         });
 
+        // Dropdown toggle
+        let currentEventFilter = 'all';
+        const filterBtn = document.getElementById('event-filter-btn');
+        const filterMenu = document.getElementById('event-filter-menu');
+        filterBtn.addEventListener('click', () => {
+            filterMenu.style.display = filterMenu.style.display === 'block' ? 'none' : 'block';
+        });
+        document.addEventListener('click', (e) => {
+            if (!filterBtn.contains(e.target) && !filterMenu.contains(e.target)) {
+                filterMenu.style.display = 'none';
+            }
+        });
+
+        // Filtering logic
+        // Mapping for button text
+        const filterNames = {
+            all: 'All Events',
+            upcoming: 'Upcoming',
+            ongoing: 'Ongoing',
+            past: 'Past',
+            cancelled: 'Cancelled'
+        };
+
+        filterMenu.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', () => {
+                currentEventFilter = item.getAttribute('data-filter');
+                filterBtn.innerHTML = `<i class="fas fa-filter"></i> ${filterNames[currentEventFilter]} <i class="fas fa-caret-down"></i>`;
+                filterMenu.style.display = 'none';
+                loadEvents();
+            });
+        });
+
+        // Set initial button text
+        filterBtn.innerHTML = `<i class="fas fa-filter"></i> ${filterNames[currentEventFilter]} <i class="fas fa-caret-down"></i>`;
+
+
         // Function to render events
         async function loadEvents() {
             const tbody = document.getElementById('events-tbody');
@@ -656,10 +705,14 @@
                             <td>${event.venue}</td>
                             <td>${event.capacity}</td>
                             <td>${event.registrations}</td>
+                            <td><span class="status-badge open">Open</span></td>
                             <td>
                                 <div class="action-buttons">
                                     <button class="action-btn edit" title="Edit" data-id="${event.event_id}">
                                         <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn delete" title="" data-id="${event.event_id}">
+                                        <i class="fas fa-times-circle"></i>
                                     </button>
                                     <button class="action-btn delete" title="Delete" data-id="${event.event_id}">
                                         <i class="fas fa-trash"></i>
