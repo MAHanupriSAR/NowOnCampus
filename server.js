@@ -206,6 +206,36 @@ app.post('/deleteStudent', async (req, res) => {
   }
 });
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
+//event management
+app.post('/createEvent', async (req, res) => {
+  const {
+    event_name,
+    start_datetime,
+    end_datetime,
+    venue,
+    event_type,
+    department,
+    capacity,
+    organiser_name,
+    agenda,
+    description
+  } = req.body;
+  try {
+    await db.promise().query(
+      `INSERT INTO events 
+        (event_name, start_datetime, end_datetime, venue, event_type, department, capacity, organiser_name, agenda, description)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [event_name, start_datetime, end_datetime, venue, event_type, department, capacity, organiser_name, agenda, description]
+    );
+    res.json({ message: 'Event created successfully' });
+  } catch (error) {
+    console.error('Create event error:', error);
+    res.status(500).json({ error: 'Failed to create event' });
+  }
+});
+
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

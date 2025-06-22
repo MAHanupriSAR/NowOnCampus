@@ -217,6 +217,26 @@
                             </tbody>
                         </table>
                     </div>
+                    <!-- Event Create Popup Form -->
+                    <div id="create-event-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.4); z-index:1000; align-items:center; justify-content:center;">
+                        <form id="create-event-form" style="background:#fff; padding:2rem; border-radius:8px; max-width:400px; margin:auto; position:relative;">
+                            <h3>Create Event</h3>
+                            <label>Event Name: <input type="text" id="event-name" required></label><br>
+                            <label>Start Date: <input type="date" id="event-start-date" required></label><br>
+                            <label>End Date: <input type="date" id="event-end-date" required></label><br>
+                            <label>Start Time: <input type="time" id="event-start-time" required></label><br>
+                            <label>End Time: <input type="time" id="event-end-time" required></label><br>
+                            <label>Venue: <input type="text" id="event-venue" required></label><br>
+                            <label>Type: <input type="text" id="event-type" placeholder="unlisted"></label><br>
+                            <label>Department: <input type="text" id="event-department"></label><br>
+                            <label>Capacity: <input type="number" id="event-capacity" required min="1"></label><br>
+                            <label>Organiser Name: <input type="text" id="event-organiser"></label><br>
+                            <label>Agenda: <input type="text" id="event-agenda"></label><br>
+                            <label>Description: <textarea id="event-description" required></textarea></label><br>
+                            <button class="btn" id="create-event-submit" type="submit">Create</button>
+                            <button class="btn" id="create-event-cancel" type="button">Cancel</button>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- Admin Management Tab -->
@@ -610,7 +630,68 @@
 
         /////////////////////////////////////////////////////////////////////////////////////////////////
         //event management
-        
+        // Show the Create Event popup
+        document.querySelector('.tab-pane#events-tab .btn-create').addEventListener('click', () => {
+            document.getElementById('create-event-modal').style.display = 'flex';
+        });
+
+        // Hide the popup on cancel
+        document.getElementById('create-event-cancel').addEventListener('click', () => {
+            document.getElementById('create-event-modal').style.display = 'none';
+            document.getElementById('create-event-form').reset();
+        });
+
+        // Handle form submission
+        document.getElementById('create-event-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            // Gather form data
+            const name = document.getElementById('event-name').value.trim();
+            const startDate = document.getElementById('event-start-date').value;
+            const endDate = document.getElementById('event-end-date').value;
+            const startTime = document.getElementById('event-start-time').value;
+            const endTime = document.getElementById('event-end-time').value;
+            const venue = document.getElementById('event-venue').value.trim();
+            const type = document.getElementById('event-type').value.trim() || 'unlisted';
+            const department = document.getElementById('event-department').value.trim();
+            const capacity = document.getElementById('event-capacity').value;
+            const organiser = document.getElementById('event-organiser').value.trim();
+            const agenda = document.getElementById('event-agenda').value.trim();
+            const description = document.getElementById('event-description').value.trim();
+
+            // Combine date and time for start and end
+            const start_datetime = `${startDate}T${startTime}`;
+            const end_datetime = `${endDate}T${endTime}`;
+
+            try {
+                const response = await fetch('http://localhost:3000/createEvent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        event_name: name,
+                        start_datetime,
+                        end_datetime,
+                        venue,
+                        event_type: type,
+                        department,
+                        capacity,
+                        organiser_name: organiser,
+                        agenda,
+                        description
+                    })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.message);
+                    document.getElementById('create-event-modal').style.display = 'none';
+                    document.getElementById('create-event-form').reset();
+                    // Optionally, reload events here
+                } else {
+                    alert(data.error || 'Error creating event');
+                }
+            } catch (err) {
+                alert('Server error');
+            }
+        });
     </script>
 </body>
 </html>
