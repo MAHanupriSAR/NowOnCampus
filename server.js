@@ -98,6 +98,29 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// Create Admin endpoint
+app.post('/createAdmin', async (req, res) => {
+  const { name, email, password } = req.body;
+  try {
+    const [existingUsers] = await db.promise().query(
+      'SELECT * FROM users WHERE email = ?',
+      [email]
+    );
+    if (existingUsers.length > 0) {
+      return res.status(400).json({ error: 'Email already in use' });
+    }
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    await db.promise().query(
+      'INSERT INTO users (name, email, password, isAdmin) VALUES (?, ?, ?, ?)',
+      [name, email, hashedPassword, 1]
+    );
+    res.status(201).json({ message: 'Admin created successfully' });
+  } catch (error) {
+    console.error('Create admin error:', error);
+    res.status(500).json({ error: 'Failed to create admin' });
+  }
+}); 
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

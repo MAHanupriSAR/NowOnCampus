@@ -223,11 +223,19 @@
                 <div class="tab-pane" id="admins-tab">
                     <div class="section-header">
                         <h2 class="section-title">Admin Management</h2>
-                        <button class="btn btn-create">
+                        <button class="btn btn-create" id="btn-create-admin">
                             <i class="fas fa-user-plus btn-icon"></i>
                             Create Admin
                         </button>
                     </div>
+                    <!-- Add a hidden form for creating new admin -->
+                    <form id="create-admin-form" style="display: none; margin-bottom: 1rem;">
+                        <label>Name: <input type="text" id="admin-name" required></label>
+                        <label>Email: <input type="email" id="admin-email" required></label>
+                        <label>Password: <input type="password" id="admin-password" required></label>
+                        <label>Confirm: <input type="password" id="admin-confirm" required></label>
+                        <button class="btn" id="create-admin-submit">Submit</button>
+                    </form>
                     <div class="table-container">
                         <table class="data-table">
                             <thead>
@@ -245,9 +253,6 @@
                                     <td><span class="role-badge admin">Admin</span></td>
                                     <td>
                                         <div class="action-buttons">
-                                            <button class="action-btn view" title="View">
-                                                <i class="fas fa-external-link-alt"></i>
-                                            </button>
                                             <button class="action-btn edit" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </button>
@@ -338,12 +343,41 @@
             });
         });
 
-        // Create button functionality
-        document.querySelectorAll('.btn-create').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const text = btn.textContent.trim();
-                alert(`${text} functionality would be implemented here!`);
-            });
+        // Toggle Create Admin form
+        document.getElementById('btn-create-admin').addEventListener('click', () => {
+            const form = document.getElementById('create-admin-form');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Handle form submission
+        document.getElementById('create-admin-submit').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('admin-name').value.trim();
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-password').value;
+            const confirm = document.getElementById('admin-confirm').value;
+
+            if (password !== confirm) {
+                alert('Passwords do not match.');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/createAdmin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    alert(data.message);
+                    // Reload or fetch updated list
+                } else {
+                    alert(data.error || 'Error creating admin');
+                }
+            } catch (err) {
+                alert('Server error');
+            }
         });
     </script>
 </body>
