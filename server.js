@@ -258,6 +258,32 @@ app.get('/events', async (req, res) => {
   }
 });
 
+app.post('/cancelEvent', async (req, res) => {
+  const { event_id } = req.body;
+  try {
+    await db.promise().query(
+      'UPDATE events SET event_status = "cancelled" WHERE event_id = ?',
+      [event_id]
+    );
+    res.json({ message: 'Event cancelled successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to cancel event' });
+  }
+});
+
+app.post('/deleteEvent', async (req, res) => {
+  const { event_id } = req.body;
+  try {
+    await db.promise().query(
+      'DELETE FROM events WHERE event_id = ?',
+      [event_id]
+    );
+    res.json({ message: 'Event deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete event' });
+  }
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
