@@ -221,12 +221,24 @@ app.post('/createEvent', async (req, res) => {
     agenda,
     description
   } = req.body;
+
   try {
+    // Calculate event_status
+    const now = new Date();
+    const start = new Date(start_datetime);
+    const end = new Date(end_datetime);
+    let event_status = 'upcoming';
+    if (now > end) {
+      event_status = 'past';
+    } else if (now >= start && now <= end) {
+      event_status = 'ongoing';
+    }
+
     await db.promise().query(
       `INSERT INTO events 
-        (event_name, start_datetime, end_datetime, venue, event_type, department, capacity, organiser_name, agenda, description)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [event_name, start_datetime, end_datetime, venue, event_type, department, capacity, organiser_name, agenda, description]
+        (event_name, start_datetime, end_datetime, venue, event_type, department, capacity, organiser_name, agenda, description, event_status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [event_name, start_datetime, end_datetime, venue, event_type, department, capacity, organiser_name, agenda, description, event_status]
     );
     res.json({ message: 'Event created successfully' });
   } catch (error) {
