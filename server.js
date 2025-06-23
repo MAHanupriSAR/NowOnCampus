@@ -411,13 +411,25 @@ app.post('/unwishlistEvent', async (req, res) => {
   }
 });
 
+// app.get('/userWishlist', async (req, res) => {
+//   const { user_id } = req.query;
+//   try {
+//     const [rows] = await db.promise().query('SELECT event_id FROM wishlist WHERE user_id = ?', [user_id]);
+//     res.json(rows);
+//   } catch (error) {
+//     res.status(500).json({ error: 'Failed to fetch wishlist' });
+//   }
+// });
 app.get('/userWishlist', async (req, res) => {
   const { user_id } = req.query;
   try {
-    const [rows] = await db.promise().query('SELECT event_id FROM wishlist WHERE user_id = ?', [user_id]);
+    const [rows] = await db.promise().query(
+      'SELECT e.* FROM wishlist w JOIN events e ON w.event_id = e.event_id WHERE w.user_id = ? ORDER BY e.start_datetime DESC',
+      [user_id]
+    );
     res.json(rows);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch wishlist' });
+    res.status(500).json({ error: 'Failed to fetch wishlist events' });
   }
 });
 

@@ -74,18 +74,16 @@ document.getElementById('nextMonth').addEventListener('click', () => {
     generateCalendar(currentMonth, currentYear);
 });
 
-// Tab functionality
+// Tab switching logic (add this if not present)
 document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         const tabName = btn.getAttribute('data-tab');
-        
-        // Remove active class from all tabs and panes
         document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-        
-        // Add active class to clicked tab and corresponding pane
         btn.classList.add('active');
         document.getElementById(`${tabName}-tab`).classList.add('active');
+        if (tabName === 'registered') loadRegisteredEvents();
+        if (tabName === 'wishlist') loadWishlistEvents();
     });
 });
 
@@ -180,6 +178,144 @@ document.querySelector('#registered-tab .events-list').addEventListener('click',
                     loadRegisteredEvents();
                 } else {
                     alert(data.error || 'Failed to cancel registration');
+                }
+            } catch (err) {
+                alert('Server error');
+            }
+        }
+    }
+});
+
+//Fetch the user's registered event IDs before rendering the wishlist:
+async function fetchUserRegisteredEvents(userId) {
+    try {
+        const res = await fetch(`http://localhost:3000/userRegisteredEvents?user_id=${userId}`);
+        if (!res.ok) return [];
+        const data = await res.json();
+        // If your endpoint returns full event objects, map to IDs:
+        return data.map(item => String(item.event_id));
+    } catch (err) {
+        return [];
+    }
+}
+// Load wishlisted events
+async function loadWishlistEvents() {
+    const container = document.querySelector('#wishlist-tab .events-list');
+    container.innerHTML = 'Loading...';
+    try {
+        // Fetch both wishlisted and registered event IDs
+        const [wishlistRes, registeredIds] = await Promise.all([
+            fetch(`http://localhost:3000/userWishlist?user_id=${currentUserId}`),
+            fetchUserRegisteredEvents(currentUserId)
+        ]);
+        const events = await wishlistRes.json();
+        if (!Array.isArray(events) || events.length === 0) {
+            container.innerHTML = '<div>No wishlisted events found.</div>';
+            return;
+        }
+        container.innerHTML = events.map(event => {
+            const isRegistered = registeredIds.includes(String(event.event_id));
+            const registerBtnClass = isRegistered ? 'btn-action btn-register registered' : 'btn-action btn-register';
+            const registerBtnContent = isRegistered
+                ? '<i class="fas fa-check register-icon"></i> Registered'
+                : '<i class="fas fa-user-plus register-icon"></i> Register';
+            const start = new Date(event.start_datetime);
+            const dateStr = `${start.toLocaleDateString()} at ${start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+            return `
+                <div class="event-item">
+                    <div class="event-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="event-info">
+                        <h3 class="event-title">${event.event_name}</h3>
+                        <p class="event-details">
+                            <i class="fas fa-calendar-alt detail-icon"></i>
+                            ${dateStr}
+                        </p>
+                        <p class="event-details">
+                            <i class="fas fa-map-marker-alt detail-icon"></i>
+                            ${event.venue}
+                        </p>
+                    </div>
+                    <div class="event-actions">
+                        <button class="${registerBtnClass}" data-event-id="${event.event_id}">
+                            ${registerBtnContent}
+                        </button>
+                        <button class="btn-action btn-remove" data-event-id="${event.event_id}">
+                            <i class="fas fa-heart-broken"></i>
+                            Remove
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (err) {
+        container.innerHTML = '<div>Failed to load wishlist events.</div>';
+    }
+}
+
+// Delegate register and remove button clicks in wishlist events
+document.querySelector('#wishlist-tab .events-list').addEventListener('click', async function(e) {
+    const registerBtn = e.target.closest('.btn-register');
+    const removeBtn = e.target.closest('.btn-remove');
+    const card = e.target.closest('.event-item');
+    if (!card) return;
+    const eventId = card.querySelector('[data-event-id]').getAttribute('data-event-id');
+
+    // Register/Unregister event
+    if (registerBtn) {
+        const isRegistered = registerBtn.classList.contains('registered');
+        if (!isRegistered) {
+            // Register
+            try {
+                const res = await fetch('http://localhost:3000/registerEvent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUserId, event_id: eventId })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    loadWishlistEvents();
+                } else {
+                    alert(data.error || 'Registration failed');
+                }
+            } catch (err) {
+                alert('Server error');
+            }
+        } else {
+            // Unregister
+            try {
+                const res = await fetch('http://localhost:3000/unregisterEvent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUserId, event_id: eventId })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    loadWishlistEvents();
+                } else {
+                    alert(data.error || 'Unregister failed');
+                }
+            } catch (err) {
+                alert('Server error');
+            }
+        }
+    }
+
+    // Remove from wishlist
+    if (removeBtn) {
+        if (confirm('Remove this event from your wishlist?')) {
+            try {
+                const res = await fetch('http://localhost:3000/unwishlistEvent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUserId, event_id: eventId })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    loadWishlistEvents();
+                } else {
+                    alert(data.error || 'Failed to remove from wishlist');
                 }
             } catch (err) {
                 alert('Server error');
