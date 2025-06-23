@@ -42,3 +42,4 @@ CREATE TABLE events (
     PRIMARY KEY (event_id)
 );
 
+create table numbers(user_id INT, event_id INT);
