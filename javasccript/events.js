@@ -89,7 +89,7 @@ async function loadEvents(filterStatus = '', searchTerm = '', wishlistedIds = []
             const statusBadge = event.event_status ? `<span class="event-status ${event.event_status.toLowerCase()}">${event.event_status.charAt(0).toUpperCase() + event.event_status.slice(1)}</span>` : '';
             const dept = event.department || '-';
             return `
-                <div class="event-card" data-event-id="${event.event_id}">
+                <div class="event-card" data-event-id="${event.event_id}" style="cursor:pointer;">
                     <div class="event-icon-wrapper">
                         <div class="event-icon">
                             <i class="fas fa-calendar-alt"></i>
