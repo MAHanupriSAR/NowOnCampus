@@ -361,6 +361,17 @@ app.get('/userRegisteredEvents', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch registered events' });
   }
 });
+app.post('/unregisterEvent', async (req, res) => {
+  const { user_id, event_id } = req.body;
+  try {
+    await db.promise().query('DELETE FROM register WHERE user_id = ? AND event_id = ?', [user_id, event_id]);
+    // Optionally decrement registrations count in events table
+    await db.promise().query('UPDATE events SET registrations = GREATEST(registrations - 1, 0) WHERE event_id = ?', [event_id]);
+    res.json({ message: 'Unregistered successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to unregister' });
+  }
+});
 
 // Add to wishlist
 app.post('/wishlistEvent', async (req, res) => {

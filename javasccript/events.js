@@ -117,7 +117,7 @@ async function loadEvents(filterStatus = '', searchTerm = '', wishlistedIds = []
                             </div>
                         </div>
                         <div class="event-actions">
-                            <button class="${registerBtnClass}" ${isRegistered ? 'disabled' : ''}>
+                            <button class="${registerBtnClass}">
                                 ${registerBtnContent}
                             </button>
                             <button class="${favoriteBtnClass}">
@@ -165,27 +165,50 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Delegate register and wishlist button click
 document.getElementById('events-grid').addEventListener('click', async function(e) {
-    // Register
-    if (e.target.closest('.btn-register') && !e.target.closest('.btn-register').classList.contains('registered')) {
+    // Register/Unregister toggle
+    if (e.target.closest('.btn-register')) {
         const btn = e.target.closest('.btn-register');
         const card = e.target.closest('.event-card');
         const eventId = card.getAttribute('data-event-id');
-        try {
-            const res = await fetch('http://localhost:3000/registerEvent', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: currentUserId, event_id: eventId })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                btn.classList.add('registered');
-                btn.innerHTML = '<i class="fas fa-check register-icon"></i> Registered';
-                btn.disabled = true;
-            } else {
-                alert(data.error || 'Registration failed');
+        const isRegistered = btn.classList.contains('registered');
+        if (!isRegistered) {
+            // Register
+            try {
+                const res = await fetch('http://localhost:3000/registerEvent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUserId, event_id: eventId })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    btn.classList.add('registered');
+                    btn.innerHTML = '<i class="fas fa-check register-icon"></i> Registered';
+                    btn.disabled = false; // allow unregister
+                } else {
+                    alert(data.error || 'Registration failed');
+                }
+            } catch (err) {
+                alert('Server error');
             }
-        } catch (err) {
-            alert('Server error');
+        } else {
+            // Unregister
+            try {
+                const res = await fetch('http://localhost:3000/unregisterEvent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUserId, event_id: eventId })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    btn.classList.remove('registered');
+                    btn.innerHTML = '<i class="fas fa-user-plus register-icon"></i> Register';
+                    btn.disabled = false;
+                } else {
+                    alert(data.error || 'Unregister failed');
+                }
+            } catch (err) {
+                alert('Server error');
+            }
         }
     }
     // Wishlist toggle
