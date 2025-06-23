@@ -39,6 +39,12 @@ async function loadEventDetails() {
             return;
         }
         const event = await res.json();
+        const statusBadge = document.getElementById('event-status');
+        if (statusBadge) {
+            const status = (event.event_status || '').toLowerCase();
+            statusBadge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            statusBadge.className = 'status-badge ' + status; // e.g., status-badge upcoming
+        }
 
         // Fill all fields
         document.getElementById('event-title').textContent = event.event_name || '';
@@ -53,6 +59,7 @@ async function loadEventDetails() {
         document.getElementById('event-department').textContent = event.department || '';
         document.getElementById('event-registrations').textContent = event.registrations ?? '';
         document.getElementById('event-capacity').textContent = event.capacity ? `${event.capacity} attendees` : '';
+        document.getElementById('event-type').textContent = event.event_type || '';
 
         // Description and agenda
         let descHtml = '';

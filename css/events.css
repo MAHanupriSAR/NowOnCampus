@@ -371,25 +371,10 @@ body {
     font-weight: 500;
 }
 
-.event-status.ongoing {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.event-status.upcoming {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.event-status.cancelled {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.event-status.past {
-    background: #dcfce7;
-    color: #166534;
-}
+.event-status.upcoming { background: #e0f7fa; color: #00796b; }
+.event-status.ongoing { background: #fff3e0; color: #ef6c00; }
+.event-status.past { background: #ececec; color: #757575; }
+.event-status.cancelled { background: #ffebee; color: #c62828; }
 
 .event-title {
     font-size: 1.3rem;
