@@ -46,7 +46,7 @@ document.querySelectorAll('.event-card').forEach(card => {
 });
 
 // Fetch and render events from the database
-async function loadEvents(filterStatus = '', searchTerm = '') {
+async function loadEvents(filterStatus = '', searchTerm = '', wishlistedIds = []) {
     const grid = document.getElementById('events-grid');
     grid.innerHTML = 'Loading...';
     try {
@@ -75,6 +75,9 @@ async function loadEvents(filterStatus = '', searchTerm = '') {
         }
 
         grid.innerHTML = events.map(event => {
+            const isFavorited = wishlistedIds.includes(String(event.event_id));
+            const favoriteBtnClass = isFavorited ? 'btn-favorite favorited' : 'btn-favorite';
+            const favoriteIconClass = isFavorited ? 'favorite-icon fas' : 'favorite-icon far';
             const start = new Date(event.start_datetime);
             const dateStr = `${start.toLocaleDateString()} at ${start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
             const typeBadge = event.event_type ? `<span class="event-type ${event.event_type.toLowerCase()}">${event.event_type}</span>` : '';
@@ -113,8 +116,8 @@ async function loadEvents(filterStatus = '', searchTerm = '') {
                                 <i class="fas fa-user-plus register-icon"></i>
                                 Register
                             </button>
-                            <button class="btn-favorite">
-                                <i class="far fa-heart favorite-icon"></i>
+                            <button class="${favoriteBtnClass}">
+                                <i class="${favoriteIconClass} fa-heart"></i>
                             </button>
                         </div>
                     </div>
@@ -126,16 +129,21 @@ async function loadEvents(filterStatus = '', searchTerm = '') {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+// Helper: get current user ID (replace with your actual logic)
+const user = JSON.parse(localStorage.getItem('user') || '{}');
+const currentUserId = user.id;
+
+document.addEventListener('DOMContentLoaded', async () => {
     let currentFilter = '';
     let currentSearch = '';
+    let wishlistedIds = await fetchUserWishlist(currentUserId);
+
+    function updateEvents() {
+        loadEvents(currentFilter, currentSearch, wishlistedIds);
+    }
 
     const statusSelect = document.querySelector('.filter-select');
     const searchInput = document.querySelector('.search-input');
-
-    function updateEvents() {
-        loadEvents(currentFilter, currentSearch);
-    }
 
     statusSelect.addEventListener('change', function() {
         currentFilter = this.value;
@@ -151,9 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// Helper: get current user ID (replace with your actual logic)
-const user = JSON.parse(localStorage.getItem('user') || '{}');
-const currentUserId = user.id;
+
 
 // Delegate register and wishlist button click
 document.getElementById('events-grid').addEventListener('click', async function(e) {
@@ -225,15 +231,15 @@ document.getElementById('events-grid').addEventListener('click', async function(
     }
 });
 
-//for show already wishlisted events as red hearts on page load,
-async function getUserWishlistIds(userId) {
+//for 
+async function fetchUserWishlist(userId) {
     try {
         const res = await fetch(`http://localhost:3000/userWishlist?user_id=${userId}`);
-        const wishlist = await res.json();
-        // Return an array of event_id
-        return Array.isArray(wishlist) ? wishlist.map(w => w.event_id) : [];
+        if (!res.ok) return [];
+        const data = await res.json();
+        // data is an array of objects: [{event_id: 1}, ...]
+        return data.map(item => String(item.event_id));
     } catch (err) {
         return [];
     }
 }
-
