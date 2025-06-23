@@ -158,9 +158,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateEvents();
 });
 
-
-
-
 // Delegate register and wishlist button click
 document.getElementById('events-grid').addEventListener('click', async function(e) {
     // Register
