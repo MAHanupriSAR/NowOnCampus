@@ -352,10 +352,22 @@ app.post('/registerEvent', async (req, res) => {
     res.status(500).json({ error: 'Failed to register' });
   }
 });
+// app.get('/userRegisteredEvents', async (req, res) => {
+//   const { user_id } = req.query;
+//   try {
+//     const [rows] = await db.promise().query('SELECT event_id FROM register WHERE user_id = ?', [user_id]);
+//     res.json(rows);
+//   } catch (error) {
+//     res.status(500).json({ error: 'Failed to fetch registered events' });
+//   }
+// });
 app.get('/userRegisteredEvents', async (req, res) => {
   const { user_id } = req.query;
   try {
-    const [rows] = await db.promise().query('SELECT event_id FROM register WHERE user_id = ?', [user_id]);
+    const [rows] = await db.promise().query(
+      'SELECT e.* FROM register r JOIN events e ON r.event_id = e.event_id WHERE r.user_id = ? ORDER BY e.start_datetime DESC',
+      [user_id]
+    );
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch registered events' });
@@ -408,6 +420,10 @@ app.get('/userWishlist', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch wishlist' });
   }
 });
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//calender.js
+
 
 const PORT = 3000;
 app.listen(PORT, () => {
