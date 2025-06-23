@@ -336,6 +336,58 @@ app.get('/adminStats', async (req, res) => {
 });
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Register for event
+app.post('/registerEvent', async (req, res) => {
+  const { user_id, event_id } = req.body;
+  try {
+    // Prevent duplicate registration
+    const [rows] = await db.promise().query('SELECT * FROM register WHERE user_id = ? AND event_id = ?', [user_id, event_id]);
+    if (rows.length > 0) return res.status(400).json({ error: 'Already registered' });
+
+    await db.promise().query('INSERT INTO register (user_id, event_id) VALUES (?, ?)', [user_id, event_id]);
+    // Optionally increment registrations count in events table
+    await db.promise().query('UPDATE events SET registrations = registrations + 1 WHERE event_id = ?', [event_id]);
+    res.json({ message: 'Registered successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to register' });
+  }
+});
+
+// Add to wishlist
+app.post('/wishlistEvent', async (req, res) => {
+  const { user_id, event_id } = req.body;
+  try {
+    // Prevent duplicate wishlist
+    const [rows] = await db.promise().query('SELECT * FROM wishlist WHERE user_id = ? AND event_id = ?', [user_id, event_id]);
+    if (rows.length > 0) return res.status(400).json({ error: 'Already wishlisted' });
+
+    await db.promise().query('INSERT INTO wishlist (user_id, event_id) VALUES (?, ?)', [user_id, event_id]);
+    res.json({ message: 'Added to wishlist' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to add to wishlist' });
+  }
+});
+
+// Remove from wishlist
+app.post('/unwishlistEvent', async (req, res) => {
+  const { user_id, event_id } = req.body;
+  try {
+    await db.promise().query('DELETE FROM wishlist WHERE user_id = ? AND event_id = ?', [user_id, event_id]);
+    res.json({ message: 'Removed from wishlist' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to remove from wishlist' });
+  }
+});
+
+app.get('/userWishlist', async (req, res) => {
+  const { user_id } = req.query;
+  try {
+    const [rows] = await db.promise().query('SELECT event_id FROM wishlist WHERE user_id = ?', [user_id]);
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch wishlist' });
+  }
+});
 
 const PORT = 3000;
 app.listen(PORT, () => {

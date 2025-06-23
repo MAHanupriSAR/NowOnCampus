@@ -81,7 +81,7 @@ async function loadEvents(filterStatus = '', searchTerm = '') {
             const statusBadge = event.event_status ? `<span class="event-status ${event.event_status.toLowerCase()}">${event.event_status.charAt(0).toUpperCase() + event.event_status.slice(1)}</span>` : '';
             const dept = event.department || '-';
             return `
-                <div class="event-card">
+                <div class="event-card" data-event-id="${event.event_id}">
                     <div class="event-icon-wrapper">
                         <div class="event-icon">
                             <i class="fas fa-calendar-alt"></i>
@@ -149,3 +149,91 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateEvents();
 });
+
+
+// Helper: get current user ID (replace with your actual logic)
+const user = JSON.parse(localStorage.getItem('user') || '{}');
+const currentUserId = user.id;
+
+// Delegate register and wishlist button click
+document.getElementById('events-grid').addEventListener('click', async function(e) {
+    // Register
+    if (e.target.closest('.btn-register')) {
+        const card = e.target.closest('.event-card');
+        const eventId = card.getAttribute('data-event-id');
+        try {
+            const res = await fetch('http://localhost:3000/registerEvent', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: currentUserId, event_id: eventId })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                alert('Registered successfully!');
+            } else {
+                alert(data.error || 'Registration failed');
+            }
+        } catch (err) {
+            alert('Server error');
+        }
+    }
+    // Wishlist toggle
+    if (e.target.closest('.btn-favorite')) {
+        const btn = e.target.closest('.btn-favorite');
+        const card = btn.closest('.event-card');
+        const eventId = card.getAttribute('data-event-id');
+        const isFavorited = btn.classList.contains('favorited');
+        if (!isFavorited) {
+            // Add to wishlist
+            try {
+                const res = await fetch('http://localhost:3000/wishlistEvent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUserId, event_id: eventId })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    btn.classList.add('favorited');
+                    btn.querySelector('.favorite-icon').classList.remove('far');
+                    btn.querySelector('.favorite-icon').classList.add('fas');
+                } else {
+                    alert(data.error || 'Wishlist failed');
+                }
+            } catch (err) {
+                alert('Server error');
+            }
+        } else {
+            // Remove from wishlist
+            try {
+                const res = await fetch('http://localhost:3000/unwishlistEvent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUserId, event_id: eventId })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    btn.classList.remove('favorited');
+                    btn.querySelector('.favorite-icon').classList.remove('fas');
+                    btn.querySelector('.favorite-icon').classList.add('far');
+                } else {
+                    alert(data.error || 'Remove from wishlist failed');
+                }
+            } catch (err) {
+                alert('Server error');
+            }
+        }
+    }
+});
+
+//for show already wishlisted events as red hearts on page load,
+async function getUserWishlistIds(userId) {
+    try {
+        const res = await fetch(`http://localhost:3000/userWishlist?user_id=${userId}`);
+        const wishlist = await res.json();
+        // Return an array of event_id
+        return Array.isArray(wishlist) ? wishlist.map(w => w.event_id) : [];
+    } catch (err) {
+        return [];
+    }
+}
+
