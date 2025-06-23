@@ -282,3 +282,12 @@ async function fetchUserRegisteredEvents(userId) {
         return [];
     }
 }
+
+
+/*
+bugs:
+
+i think there is a error
+suppose i register an event and it is shown as registered and that event is an upcoming event
+but when i filter on upcoming event, that same event is shown as unregistered eveent hough it is registered
+*/
