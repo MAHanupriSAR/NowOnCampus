@@ -42,4 +42,5 @@ CREATE TABLE events (
     PRIMARY KEY (event_id)
 );
 
-create table numbers(user_id INT, event_id INT);
+create table register(user_id INT, event_id INT);
+create table wishlist(user_id INT, event_id INT);
