@@ -1,0 +1,115 @@
+// View toggle functionality
+document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+    });
+});
+
+// Favorite toggle functionality
+document.querySelectorAll('.btn-favorite').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const icon = this.querySelector('.favorite-icon');
+        if (icon.classList.contains('far')) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            this.classList.add('favorited');
+        } else {
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            this.classList.remove('favorited');
+        }
+    });
+});
+
+// Search functionality
+document.querySelector('.search-input').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    document.querySelectorAll('.event-card').forEach(card => {
+        const title = card.querySelector('.event-title').textContent.toLowerCase();
+        const description = card.querySelector('.event-description').textContent.toLowerCase();
+        if (title.includes(searchTerm) || description.includes(searchTerm)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+});
+
+document.querySelectorAll('.event-card').forEach(card => {
+    card.addEventListener('click', function (e) {
+        // If clicked element is inside a button, don't navigate
+        if (!e.target.closest('button')) {
+            window.location.href = 'event_details.html';
+        }
+    });
+});
+
+// Fetch and render events from the database
+async function loadEvents() {
+    const grid = document.getElementById('events-grid');
+    grid.innerHTML = 'Loading...';
+    try {
+        const res = await fetch('http://localhost:3000/events');
+        const events = await res.json();
+        if (!Array.isArray(events) || events.length === 0) {
+            grid.innerHTML = '<div>No events found.</div>';
+            return;
+        }
+        grid.innerHTML = events.map(event => {
+            // Format date and time
+            const start = new Date(event.start_datetime);
+            const dateStr = `${start.toLocaleDateString()} at ${start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+            // Type and department badges
+            const typeBadge = event.event_type ? `<span class="event-type ${event.event_type.toLowerCase()}">${event.event_type}</span>` : '';
+            const statusBadge = event.event_status ? `<span class="event-status ${event.event_status.toLowerCase()}">${event.event_status.charAt(0).toUpperCase() + event.event_status.slice(1)}</span>` : '';
+            const dept = event.department || '';
+            // Description will be clamped by CSS
+            return `
+                <div class="event-card">
+                    <div class="event-icon-wrapper">
+                        <div class="event-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                    </div>
+                    <div class="event-content">
+                        <div class="event-badges">
+                            ${typeBadge}
+                            ${statusBadge}
+                        </div>
+                        <h3 class="event-title">${event.event_name}</h3>
+                        <p class="event-description">${event.description}</p>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <i class="fas fa-calendar-alt detail-icon"></i>
+                                <span class="detail-text">${dateStr}</span>
+                            </div>
+                            <div class="event-detail">
+                                <i class="fas fa-map-marker-alt detail-icon"></i>
+                                <span class="detail-text">${event.venue}</span>
+                            </div>
+                            <div class="event-detail">
+                                <i class="fas fa-users detail-icon"></i>
+                                <span class="detail-text">${dept}</span>
+                            </div>
+                        </div>
+                        <div class="event-actions">
+                            <button class="btn-register">
+                                <i class="fas fa-user-plus register-icon"></i>
+                                Register
+                            </button>
+                            <button class="btn-favorite">
+                                <i class="far fa-heart favorite-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (err) {
+        grid.innerHTML = '<div>Failed to load events.</div>';
+    }
+}
+
+// Call loadEvents on page load
+document.addEventListener('DOMContentLoaded', loadEvents);

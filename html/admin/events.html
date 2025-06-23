@@ -71,6 +71,7 @@
                                 <option value="workshop">Workshop</option>
                                 <option value="fest">Fest</option>
                                 <option value="career">Career</option>
+                                <option value="unlisted">Unlisted</option>
                             </select>
                             <select class="filter-select">
                                 <option value="">All Departments</option>
@@ -79,14 +80,17 @@
                                 <option value="academic-affairs">Academic Affairs</option>
                                 <option value="career-services">Career Services</option>
                             </select>
+                            <select class="filter-select">
+                                <option value="">All Status</option>
+                                <option value="upcoming">Upcoming</option>
+                                <option value="ongoing">Ongoing</option>
+                                <option value="past">Past</option>
+                                <option value="Cancelled">Cancelled</option>
+                            </select>
                         </div>
                     </div>
-                    <button class="btn-add-event">
-                        <i class="fas fa-plus add-icon"></i>
-                        Add Event
-                    </button>
                 </div>
-
+                <!-- 
                 <div class="view-controls">
                     <button class="view-btn active" data-view="cards">
                         <i class="fas fa-th-large view-icon"></i>
@@ -96,223 +100,15 @@
                         <i class="fas fa-list view-icon"></i>
                         Timeline
                     </button>
-                </div>
+                </div> -->
 
-                <div class="events-grid">
-                    <div class="event-card">
-                        <div class="event-icon-wrapper">
-                            <div class="event-icon">
-                                <i class="fas fa-calendar-alt"></i>
-                            </div>
-                        </div>
-                        <div class="event-content">
-                            <div class="event-badges">
-                                <span class="event-type seminar">Seminar</span>
-                                <span class="event-status open">Open</span>
-                            </div>
-                            <h3 class="event-title">Annual Tech Symposium 2024</h3>
-                            <p class="event-description">
-                                Join us for a day of cutting-edge technology presentations and networking.
-                            </p>
-                            <div class="event-details">
-                                <div class="event-detail">
-                                    <i class="fas fa-calendar-alt detail-icon"></i>
-                                    <span class="detail-text">2024-06-15 at 09:00 AM</span>
-                                </div>
-                                <div class="event-detail">
-                                    <i class="fas fa-map-marker-alt detail-icon"></i>
-                                    <span class="detail-text">Main Auditorium</span>
-                                </div>
-                                <div class="event-detail">
-                                    <i class="fas fa-users detail-icon"></i>
-                                    <span class="detail-text">Computer Science</span>
-                                </div>
-                            </div>
-                            <div class="event-actions">
-                                <button class="btn-register">
-                                    <i class="fas fa-user-plus register-icon"></i>
-                                    Register
-                                </button>
-                                <button class="btn-favorite">
-                                    <i class="far fa-heart favorite-icon"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="event-card">
-                        <div class="event-icon-wrapper">
-                            <div class="event-icon">
-                                <i class="fas fa-calendar-alt"></i>
-                            </div>
-                        </div>
-                        <div class="event-content">
-                            <div class="event-badges">
-                                <span class="event-type fest">Fest</span>
-                                <span class="event-status open">Open</span>
-                            </div>
-                            <h3 class="event-title">Spring Cultural Festival</h3>
-                            <p class="event-description">
-                                Celebrate diversity with music, dance, and cultural performances.
-                            </p>
-                            <div class="event-details">
-                                <div class="event-detail">
-                                    <i class="fas fa-calendar-alt detail-icon"></i>
-                                    <span class="detail-text">2024-06-20 at 06:00 PM</span>
-                                </div>
-                                <div class="event-detail">
-                                    <i class="fas fa-map-marker-alt detail-icon"></i>
-                                    <span class="detail-text">Campus Grounds</span>
-                                </div>
-                                <div class="event-detail">
-                                    <i class="fas fa-users detail-icon"></i>
-                                    <span class="detail-text">Student Affairs</span>
-                                </div>
-                            </div>
-                            <div class="event-actions">
-                                <button class="btn-register">
-                                    <i class="fas fa-user-plus register-icon"></i>
-                                    Register
-                                </button>
-                                <button class="btn-favorite">
-                                    <i class="far fa-heart favorite-icon"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="event-card">
-                        <div class="event-icon-wrapper">
-                            <div class="event-icon">
-                                <i class="fas fa-calendar-alt"></i>
-                            </div>
-                        </div>
-                        <div class="event-content">
-                            <div class="event-badges">
-                                <span class="event-type workshop">Workshop</span>
-                            </div>
-                            <h3 class="event-title">Research Methodology Workshop</h3>
-                            <p class="event-description">
-                                Learn essential research skills and methodology for academic success.
-                            </p>
-                            <div class="event-details">
-                                <div class="event-detail">
-                                    <i class="fas fa-calendar-alt detail-icon"></i>
-                                    <span class="detail-text">2024-06-18 at 02:00 PM</span>
-                                </div>
-                                <div class="event-detail">
-                                    <i class="fas fa-map-marker-alt detail-icon"></i>
-                                    <span class="detail-text">Library Conference Room</span>
-                                </div>
-                                <div class="event-detail">
-                                    <i class="fas fa-users detail-icon"></i>
-                                    <span class="detail-text">Academic Affairs</span>
-                                </div>
-                            </div>
-                            <div class="event-actions">
-                                <button class="btn-register">
-                                    <i class="fas fa-user-plus register-icon"></i>
-                                    Register
-                                </button>
-                                <button class="btn-favorite">
-                                    <i class="far fa-heart favorite-icon"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="event-card">
-                        <div class="event-icon-wrapper">
-                            <div class="event-icon">
-                                <i class="fas fa-calendar-alt"></i>
-                            </div>
-                        </div>
-                        <div class="event-content">
-                            <div class="event-badges">
-                                <span class="event-type career">Career</span>
-                                <span class="event-status open">Open</span>
-                            </div>
-                            <h3 class="event-title">Career Fair 2024</h3>
-                            <p class="event-description">
-                                Meet with top employers and explore career opportunities.
-                            </p>
-                            <div class="event-details">
-                                <div class="event-detail">
-                                    <i class="fas fa-calendar-alt detail-icon"></i>
-                                    <span class="detail-text">2024-06-25 at 10:00 AM</span>
-                                </div>
-                                <div class="event-detail">
-                                    <i class="fas fa-map-marker-alt detail-icon"></i>
-                                    <span class="detail-text">Sports Complex</span>
-                                </div>
-                                <div class="event-detail">
-                                    <i class="fas fa-users detail-icon"></i>
-                                    <span class="detail-text">Career Services</span>
-                                </div>
-                            </div>
-                            <div class="event-actions">
-                                <button class="btn-register">
-                                    <i class="fas fa-user-plus register-icon"></i>
-                                    Register
-                                </button>
-                                <button class="btn-favorite">
-                                    <i class="far fa-heart favorite-icon"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                <div class="events-grid" id="events-grid">
+                    <!-- Event cards will be inserted here by JS -->
                 </div>
             </div>
         </section>
     </main>
 
-    <script>
-        // View toggle functionality
-        document.querySelectorAll('.view-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
-
-        // Favorite toggle functionality
-        document.querySelectorAll('.btn-favorite').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const icon = this.querySelector('.favorite-icon');
-                if (icon.classList.contains('far')) {
-                    icon.classList.remove('far');
-                    icon.classList.add('fas');
-                    this.classList.add('favorited');
-                } else {
-                    icon.classList.remove('fas');
-                    icon.classList.add('far');
-                    this.classList.remove('favorited');
-                }
-            });
-        });
-
-        // Search functionality
-        document.querySelector('.search-input').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            document.querySelectorAll('.event-card').forEach(card => {
-                const title = card.querySelector('.event-title').textContent.toLowerCase();
-                const description = card.querySelector('.event-description').textContent.toLowerCase();
-                if (title.includes(searchTerm) || description.includes(searchTerm)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-
-        document.querySelectorAll('.event-card').forEach(card => {
-            card.addEventListener('click', function (e) {
-                // If clicked element is inside a button, don't navigate
-                if (!e.target.closest('button')) {
-                    window.location.href = 'event_details.html';
-                }
-            });
-        });
-    </script>
+    <script src = "../../javasccript/events.js"></script>
 </body>
 </html>

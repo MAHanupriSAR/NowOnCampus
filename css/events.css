@@ -359,6 +359,11 @@ body {
     color: #92400e;
 }
 
+.event-type.unlisted {
+    background: #fce7f3;
+    color: #686868;
+}
+
 .event-status {
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
@@ -366,7 +371,22 @@ body {
     font-weight: 500;
 }
 
-.event-status.open {
+.event-status.ongoing {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.event-status.upcoming {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.event-status.cancelled {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.event-status.past {
     background: #dcfce7;
     color: #166534;
 }
@@ -386,6 +406,16 @@ body {
 
 .event-details {
     margin-bottom: 1.5rem;
+}
+
+.event-description {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 2.6em; /* adjust as needed for your font-size */
+    max-height: 2.6em;
 }
 
 .event-detail {
