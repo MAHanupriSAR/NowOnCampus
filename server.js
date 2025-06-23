@@ -434,7 +434,17 @@ app.get('/userWishlist', async (req, res) => {
 });
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//calender.js
+//event_details.js
+app.get('/event/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await db.promise().query('SELECT * FROM events WHERE event_id = ?', [id]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Event not found' });
+    res.json(rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch event' });
+  }
+});
 
 
 const PORT = 3000;

@@ -69,51 +69,50 @@
                             Upcoming
                         </span>
                     </div>
-                    <h1 class="event-title">Annual Tech Symposium 2024</h1>
-                    
+                    <h1 class="event-title" id="event-title"></h1>
+
                     <div class="event-meta">
                         <div class="meta-row">
                             <div class="meta-item">
                                 <i class="fas fa-calendar-alt meta-icon"></i>
-                                <span class="meta-label">Date:</span>
-                                <span class="meta-value">2024-06-15</span>
+                                <span class="meta-label">Start:</span>
+                                <span class="meta-value" id="event-start"></span>
                             </div>
                             <div class="meta-item">
-                                <i class="fas fa-clock meta-icon"></i>
-                                <span class="meta-label">Time:</span>
-                                <span class="meta-value">09:00 AM - 05:00 PM</span>
+                                <i class="fas fa-calendar-alt meta-icon"></i>
+                                <span class="meta-label">End:</span>
+                                <span class="meta-value" id="event-end"></span>
                             </div>
                         </div>
                         <div class="meta-row">
                             <div class="meta-item">
                                 <i class="fas fa-map-marker-alt meta-icon"></i>
                                 <span class="meta-label">Location:</span>
-                                <span class="meta-value">Main Auditorium, Building A</span>
+                                <span class="meta-value" id="event-venue"></span>
                             </div>
                             <div class="meta-item">
                                 <i class="fas fa-user-tie meta-icon"></i>
                                 <span class="meta-label">Organizer:</span>
-                                <span class="meta-value">Dr. Sarah Johnson</span>
+                                <span class="meta-value" id="event-organiser"></span>
                             </div>
                         </div>
                         <div class="meta-row">
                             <div class="meta-item">
                                 <i class="fas fa-users meta-icon"></i>
                                 <span class="meta-label">Department:</span>
-                                <span class="meta-value">Computer Science</span>
+                                <span class="meta-value" id="event-department"></span>
                             </div>
                             <div class="meta-item">
                                 <i class="fas fa-user-friends meta-icon"></i>
                                 <span class="meta-label">Registrations:</span>
-                                <span class="meta-value">444</span>
+                                <span class="meta-value" id="event-registrations"></span>
                             </div>
-                            
                         </div>
                         <div class="meta-row">
                             <div class="meta-item">
                                 <i class="fas fa-user-friends meta-icon"></i>
                                 <span class="meta-label">Capacity:</span>
-                                <span class="meta-value">250 attendees</span>
+                                <span class="meta-value" id="event-capacity"></span>
                             </div>
                         </div>
                     </div>
@@ -139,64 +138,13 @@
                 <div class="content-main">
                     <section class="about-section">
                         <h2 class="section-title">About This Event</h2>
-                        <div class="about-text">
-                            <p>Join us for a comprehensive day of cutting-edge technology presentations and networking opportunities. This symposium brings together industry leaders, researchers, and students to explore the latest trends in technology and innovation. Sessions will cover artificial intelligence, cybersecurity, software development, and emerging technologies.</p>
-                        </div>
+                        <div class="about-text" id="event-description"></div>
                     </section>
                 </div>
-
-                <!-- <div class="content-sidebar">
-                    <section class="details-section">
-                        <h3 class="sidebar-title">Event Details</h3>
-                        <div class="detail-item">
-                            <span class="detail-label">Department:</span>
-                            <span class="detail-value">Computer Science</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Organizer:</span>
-                            <span class="detail-value">Dr. Sarah Johnson</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Capacity:</span>
-                            <span class="detail-value">250 attendees</span>
-                        </div>
-                    </section>
-
-                    <section class="requirements-section">
-                        <h3 class="sidebar-title">Requirements</h3>
-                        <div class="requirements-text">
-                            <p>Open to all students and faculty. Laptop recommended for workshops.</p>
-                        </div>
-                    </section>
-                </div> -->
             </div>
         </div>
     </main>
 
-    <script>
-        // Register button functionality
-        document.querySelector('.btn-primary').addEventListener('click', function() {
-            alert('Registration functionality would be implemented here!');
-        });
-
-        // Wishlist button functionality
-        document.querySelectorAll('.btn-secondary')[0].addEventListener('click', function() {
-            const icon = this.querySelector('i');
-            if (icon.classList.contains('fas')) {
-                icon.classList.remove('fas');
-                icon.classList.add('far');
-                this.classList.add('wishlisted');
-            } else {
-                icon.classList.remove('far');
-                icon.classList.add('fas');
-                this.classList.remove('wishlisted');
-            }
-        });
-
-        // Calendar button functionality
-        document.querySelectorAll('.btn-secondary')[1].addEventListener('click', function() {
-            alert('Add to calendar functionality would be implemented here!');
-        });
-    </script>
+    <script src = "../../javasccript/event_details.js"></script>
 </body>
 </html>

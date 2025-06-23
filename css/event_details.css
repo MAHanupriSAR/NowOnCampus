@@ -327,6 +327,16 @@ body {
   grid-template-columns: 2fr 1fr;
   gap: 2rem;
 } */
+
+#event-description {
+    white-space: pre-line;      /* respects line breaks */
+    word-break: break-word;     /* breaks long words */
+    overflow-wrap: break-word;  /* breaks long words in all browsers */
+    max-width: 100%;            /* prevents overflow */
+    /* Optional: limit width for readability */
+    /* max-width: 600px; */
+}
+
 .event-content {
   display: block;
 }
