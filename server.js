@@ -352,6 +352,15 @@ app.post('/registerEvent', async (req, res) => {
     res.status(500).json({ error: 'Failed to register' });
   }
 });
+app.get('/userRegisteredEvents', async (req, res) => {
+  const { user_id } = req.query;
+  try {
+    const [rows] = await db.promise().query('SELECT event_id FROM register WHERE user_id = ?', [user_id]);
+    res.json(rows);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch registered events' });
+  }
+});
 
 // Add to wishlist
 app.post('/wishlistEvent', async (req, res) => {

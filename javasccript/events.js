@@ -46,7 +46,7 @@ document.querySelectorAll('.event-card').forEach(card => {
 });
 
 // Fetch and render events from the database
-async function loadEvents(filterStatus = '', searchTerm = '', wishlistedIds = []) {
+async function loadEvents(filterStatus = '', searchTerm = '', wishlistedIds = [], registeredIds = []) {
     const grid = document.getElementById('events-grid');
     grid.innerHTML = 'Loading...';
     try {
@@ -78,6 +78,11 @@ async function loadEvents(filterStatus = '', searchTerm = '', wishlistedIds = []
             const isFavorited = wishlistedIds.includes(String(event.event_id));
             const favoriteBtnClass = isFavorited ? 'btn-favorite favorited' : 'btn-favorite';
             const favoriteIconClass = isFavorited ? 'favorite-icon fas' : 'favorite-icon far';
+            const isRegistered = registeredIds.includes(String(event.event_id));
+            const registerBtnClass = isRegistered ? 'btn-register registered' : 'btn-register';
+            const registerBtnContent = isRegistered
+                ? '<i class="fas fa-check register-icon"></i> Registered'
+                : '<i class="fas fa-user-plus register-icon"></i> Register';
             const start = new Date(event.start_datetime);
             const dateStr = `${start.toLocaleDateString()} at ${start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
             const typeBadge = event.event_type ? `<span class="event-type ${event.event_type.toLowerCase()}">${event.event_type}</span>` : '';
@@ -112,9 +117,8 @@ async function loadEvents(filterStatus = '', searchTerm = '', wishlistedIds = []
                             </div>
                         </div>
                         <div class="event-actions">
-                            <button class="btn-register">
-                                <i class="fas fa-user-plus register-icon"></i>
-                                Register
+                            <button class="${registerBtnClass}" ${isRegistered ? 'disabled' : ''}>
+                                ${registerBtnContent}
                             </button>
                             <button class="${favoriteBtnClass}">
                                 <i class="${favoriteIconClass} fa-heart"></i>
@@ -137,9 +141,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentFilter = '';
     let currentSearch = '';
     let wishlistedIds = await fetchUserWishlist(currentUserId);
+    let registeredIds = await fetchUserRegisteredEvents(currentUserId);
 
     function updateEvents() {
-        loadEvents(currentFilter, currentSearch, wishlistedIds);
+        loadEvents(currentFilter, currentSearch, wishlistedIds, registeredIds);
     }
 
     const statusSelect = document.querySelector('.filter-select');
@@ -161,7 +166,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Delegate register and wishlist button click
 document.getElementById('events-grid').addEventListener('click', async function(e) {
     // Register
-    if (e.target.closest('.btn-register')) {
+    if (e.target.closest('.btn-register') && !e.target.closest('.btn-register').classList.contains('registered')) {
+        const btn = e.target.closest('.btn-register');
         const card = e.target.closest('.event-card');
         const eventId = card.getAttribute('data-event-id');
         try {
@@ -172,7 +178,9 @@ document.getElementById('events-grid').addEventListener('click', async function(
             });
             const data = await res.json();
             if (res.ok) {
-                alert('Registered successfully!');
+                btn.classList.add('registered');
+                btn.innerHTML = '<i class="fas fa-check register-icon"></i> Registered';
+                btn.disabled = true;
             } else {
                 alert(data.error || 'Registration failed');
             }
@@ -235,6 +243,17 @@ async function fetchUserWishlist(userId) {
         if (!res.ok) return [];
         const data = await res.json();
         // data is an array of objects: [{event_id: 1}, ...]
+        return data.map(item => String(item.event_id));
+    } catch (err) {
+        return [];
+    }
+}
+
+async function fetchUserRegisteredEvents(userId) {
+    try {
+        const res = await fetch(`http://localhost:3000/userRegisteredEvents?user_id=${userId}`);
+        if (!res.ok) return [];
+        const data = await res.json();
         return data.map(item => String(item.event_id));
     } catch (err) {
         return [];
