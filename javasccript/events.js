@@ -46,25 +46,40 @@ document.querySelectorAll('.event-card').forEach(card => {
 });
 
 // Fetch and render events from the database
-async function loadEvents() {
+async function loadEvents(filterStatus = '', searchTerm = '') {
     const grid = document.getElementById('events-grid');
     grid.innerHTML = 'Loading...';
     try {
         const res = await fetch('http://localhost:3000/events');
-        const events = await res.json();
+        let events = await res.json();
         if (!Array.isArray(events) || events.length === 0) {
             grid.innerHTML = '<div>No events found.</div>';
             return;
         }
+
+        // Filter by status if filterStatus is set
+        if (filterStatus) {
+            events = events.filter(event => {
+                let status = (event.event_status || '').toLowerCase();
+                return status === filterStatus.toLowerCase();
+            });
+        }
+
+        // Filter by search term if set
+        if (searchTerm) {
+            events = events.filter(event => {
+                const title = (event.event_name || '').toLowerCase();
+                const description = (event.description || '').toLowerCase();
+                return title.includes(searchTerm) || description.includes(searchTerm);
+            });
+        }
+
         grid.innerHTML = events.map(event => {
-            // Format date and time
             const start = new Date(event.start_datetime);
             const dateStr = `${start.toLocaleDateString()} at ${start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-            // Type and department badges
             const typeBadge = event.event_type ? `<span class="event-type ${event.event_type.toLowerCase()}">${event.event_type}</span>` : '';
             const statusBadge = event.event_status ? `<span class="event-status ${event.event_status.toLowerCase()}">${event.event_status.charAt(0).toUpperCase() + event.event_status.slice(1)}</span>` : '';
-            const dept = event.department || '';
-            // Description will be clamped by CSS
+            const dept = event.department || '-';
             return `
                 <div class="event-card">
                     <div class="event-icon-wrapper">
@@ -111,5 +126,26 @@ async function loadEvents() {
     }
 }
 
-// Call loadEvents on page load
-document.addEventListener('DOMContentLoaded', loadEvents);
+document.addEventListener('DOMContentLoaded', () => {
+    let currentFilter = '';
+    let currentSearch = '';
+
+    const statusSelect = document.querySelector('.filter-select');
+    const searchInput = document.querySelector('.search-input');
+
+    function updateEvents() {
+        loadEvents(currentFilter, currentSearch);
+    }
+
+    statusSelect.addEventListener('change', function() {
+        currentFilter = this.value;
+        updateEvents();
+    });
+
+    searchInput.addEventListener('input', function() {
+        currentSearch = this.value.toLowerCase();
+        updateEvents();
+    });
+
+    updateEvents();
+});
