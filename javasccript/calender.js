@@ -13,15 +13,122 @@ const events = {
     '2025-06-20': ['Spring Cultural Festival']
 };
 
-function generateCalendar(month, year) {
+
+const user = JSON.parse(localStorage.getItem('user') || '{}');
+const currentUserId = user.id;
+
+// function generateCalendar(month, year) {
+//     const firstDay = new Date(year, month, 1).getDay();
+//     const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+//     const calendarDays = document.getElementById('calendarDays');
+//     const calendarTitle = document.getElementById('calendarTitle');
+    
+//     calendarTitle.textContent = `${months[month]} ${year}`;
+//     calendarDays.innerHTML = '';
+
+//     // Add empty cells for days before the first day of the month
+//     for (let i = 0; i < firstDay; i++) {
+//         const emptyDay = document.createElement('div');
+//         emptyDay.className = 'calendar-day empty';
+//         calendarDays.appendChild(emptyDay);
+//     }
+
+//     // Add days of the month
+//     for (let day = 1; day <= daysInMonth; day++) {
+//         const dayElement = document.createElement('div');
+//         dayElement.className = 'calendar-day';
+//         dayElement.textContent = day;
+
+//         const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        
+//         if (events[dateKey]) {
+//             dayElement.classList.add('has-event');
+//         }
+
+//         if (day === 15 && month === 5 && year === 2025) {
+//             dayElement.classList.add('selected');
+//         }
+
+//         dayElement.addEventListener('click', () => {
+//             document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+//             dayElement.classList.add('selected');
+//         });
+
+//         calendarDays.appendChild(dayElement);
+//     }
+// }
+function getDatesBetween(start, end) {
+    const dates = [];
+    let current = new Date(start);
+    end = new Date(end);
+    while (current <= end) {
+        dates.push(current.toISOString().slice(0, 10)); // 'YYYY-MM-DD'
+        current.setDate(current.getDate() + 1);
+    }
+    return dates;
+}
+function showCalendarPopup(dateStr, eventNames) {
+    const popup = document.getElementById('calendar-popup');
+    const popupDate = document.getElementById('calendar-popup-date');
+    const popupList = document.getElementById('calendar-popup-list');
+    popupDate.textContent = new Date(dateStr).toLocaleDateString();
+    popupList.innerHTML = '';
+
+    if (eventNames.length === 0) {
+        popupList.innerHTML = '<li>No events on this day.</li>';
+    } else {
+        eventNames.forEach(name => {
+            const li = document.createElement('li');
+            li.textContent = name;
+            popupList.appendChild(li);
+        });
+    }
+    popup.style.display = 'flex';
+}
+
+// Close popup handler
+document.addEventListener('DOMContentLoaded', () => {
+    const popup = document.getElementById('calendar-popup');
+    const closeBtn = document.getElementById('calendar-popup-close');
+    if (closeBtn) {
+        closeBtn.onclick = () => { popup.style.display = 'none'; };
+    }
+    // Optional: close popup when clicking outside content
+    popup.addEventListener('click', (e) => {
+        if (e.target === popup) popup.style.display = 'none';
+    });
+});
+async function generateCalendar(month, year) {
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    
+
     const calendarDays = document.getElementById('calendarDays');
     const calendarTitle = document.getElementById('calendarTitle');
-    
     calendarTitle.textContent = `${months[month]} ${year}`;
     calendarDays.innerHTML = '';
+
+    // Fetch registered events for the current user
+    const res = await fetch(`http://localhost:3000/userRegisteredEvents?user_id=${currentUserId}`);
+    const events = await res.json();
+
+    const eventsByDate = {};
+    events.forEach(event => {
+        const start = new Date(event.start_datetime);
+        const end = new Date(event.end_datetime || event.start_datetime);
+        getDatesBetween(start, end).forEach(dateStr => {
+            if (!eventsByDate[dateStr]) eventsByDate[dateStr] = [];
+            eventsByDate[dateStr].push(event.event_name);
+        });
+    });
+
+    // Build a set of all dates that have a registered event
+    const eventDates = new Set();
+    events.forEach(event => {
+        const start = new Date(event.start_datetime);
+        const end = new Date(event.end_datetime || event.start_datetime);
+        getDatesBetween(start, end).forEach(dateStr => eventDates.add(dateStr));
+    });
 
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < firstDay; i++) {
@@ -37,18 +144,15 @@ function generateCalendar(month, year) {
         dayElement.textContent = day;
 
         const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        
-        if (events[dateKey]) {
+        if (eventDates.has(dateKey)) {
             dayElement.classList.add('has-event');
         }
 
-        if (day === 15 && month === 5 && year === 2025) {
-            dayElement.classList.add('selected');
-        }
-
-        dayElement.addEventListener('click', () => {
+        // POPUP: Show events on this date
+        dayElement.addEventListener('dblclick', () => {
             document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
             dayElement.classList.add('selected');
+            showCalendarPopup(dateKey, eventsByDate[dateKey] || []);
         });
 
         calendarDays.appendChild(dayElement);
@@ -100,9 +204,6 @@ document.querySelectorAll('.btn-action').forEach(btn => {
 
 // Initialize calendar
 generateCalendar(currentMonth, currentYear);
-
-const user = JSON.parse(localStorage.getItem('user') || '{}');
-const currentUserId = user.id;
 
 // Fetch and render registered events
 async function loadRegisteredEvents() {

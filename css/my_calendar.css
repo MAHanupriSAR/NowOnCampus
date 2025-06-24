@@ -270,6 +270,10 @@ body {
 }
 
 .calendar-day {
+    cursor: pointer;
+}
+
+.calendar-day {
     aspect-ratio: 1;
     display: flex;
     align-items: center;
@@ -440,6 +444,89 @@ body {
 .btn-remove:hover {
     background: #f59e0b;
     color: white;
+}
+
+/* Calendar Popup Styles */
+.calendar-popup {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(30, 41, 59, 0.25); /* subtle dark overlay */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: background 0.2s;
+}
+
+.calendar-popup-content {
+    background: #fff;
+    border-radius: 14px;
+    padding: 2rem 2.5rem 1.5rem 2.5rem;
+    min-width: 320px;
+    max-width: 90vw;
+    box-shadow: 0 8px 32px rgba(30,41,59,0.15);
+    position: relative;
+    text-align: left;
+    animation: popupIn 0.18s cubic-bezier(.4,0,.2,1);
+}
+
+@keyframes popupIn {
+    from { transform: translateY(30px) scale(0.98); opacity: 0; }
+    to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.calendar-popup-close {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    font-size: 1.5rem;
+    color: #64748b;
+    cursor: pointer;
+    transition: color 0.2s;
+    font-weight: bold;
+    background: none;
+    border: none;
+    outline: none;
+}
+
+.calendar-popup-close:hover {
+    color: #ef4444;
+}
+
+.calendar-popup-title {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.15rem;
+    color: #3b82f6;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+#calendar-popup-list {
+    padding-left: 1.2em;
+    margin: 0;
+    list-style: disc;
+}
+
+#calendar-popup-list li {
+    margin-bottom: 0.5em;
+    font-size: 1rem;
+    color: #1e293b;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+@media (max-width: 600px) {
+    .calendar-popup-content {
+        padding: 1rem 0.7rem 1rem 0.7rem;
+        min-width: 0;
+    }
+    .calendar-popup-title {
+        font-size: 1rem;
+    }
+    #calendar-popup-list li {
+        font-size: 0.95rem;
+    }
 }
 
 /* Responsive Design */
