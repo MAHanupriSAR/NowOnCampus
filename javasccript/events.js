@@ -165,12 +165,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Delegate register and wishlist button click
 document.getElementById('events-grid').addEventListener('click', async function(e) {
-    const card = e.target.closest('.event-card');
-    if (card) {
-        const eventId = card.getAttribute('data-event-id');
-        window.location.href = `event_details.html?event_id=${eventId}`;
-    }
-
     // Register/Unregister toggle
     if (e.target.closest('.btn-register')) {
         const btn = e.target.closest('.btn-register');
@@ -216,6 +210,7 @@ document.getElementById('events-grid').addEventListener('click', async function(
                 alert('Server error');
             }
         }
+        return;
     }
     // Wishlist toggle
     if (e.target.closest('.btn-favorite')) {
@@ -262,6 +257,13 @@ document.getElementById('events-grid').addEventListener('click', async function(
                 alert('Server error');
             }
         }
+        return;
+    }
+
+    const card = e.target.closest('.event-card');
+    if (card) {
+        const eventId = card.getAttribute('data-event-id');
+        window.location.href = `event_details.html?event_id=${eventId}`;
     }
 });
 
