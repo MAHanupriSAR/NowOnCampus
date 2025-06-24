@@ -138,25 +138,46 @@ async function generateCalendar(month, year) {
     }
 
     // Add days of the month
-    for (let day = 1; day <= daysInMonth; day++) {
-        const dayElement = document.createElement('div');
-        dayElement.className = 'calendar-day';
-        dayElement.textContent = day;
+for (let day = 1; day <= daysInMonth; day++) {
+    const dayElement = document.createElement('div');
+    dayElement.className = 'calendar-day';
+    dayElement.textContent = day;
 
-        const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        if (eventDates.has(dateKey)) {
-            dayElement.classList.add('has-event');
-        }
+    const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-        // POPUP: Show events on this date
-        dayElement.addEventListener('dblclick', () => {
-            document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
-            dayElement.classList.add('selected');
-            showCalendarPopup(dateKey, eventsByDate[dateKey] || []);
-        });
-
-        calendarDays.appendChild(dayElement);
+    // Highlight today
+    const today = new Date();
+    if (
+        day === today.getDate() &&
+        month === today.getMonth() &&
+        year === today.getFullYear()
+    ) {
+        dayElement.classList.add('today');
     }
+
+    if (eventDates.has(dateKey)) {
+        dayElement.classList.add('has-event');
+    }
+
+    // Single click: select date (light blue box)
+    dayElement.addEventListener('click', () => {
+        // Remove .selected from all days except today (today keeps its blue box)
+        document.querySelectorAll('.calendar-day.selected').forEach(d => {
+            if (!d.classList.contains('today')) d.classList.remove('selected');
+        });
+        // Add .selected to clicked day (unless it's today, which is already blue)
+        if (!dayElement.classList.contains('today')) {
+            dayElement.classList.add('selected');
+        }
+    });
+
+    // Double-click to show popup
+    dayElement.addEventListener('dblclick', () => {
+        showCalendarPopup(dateKey, eventsByDate[dateKey] || []);
+    });
+
+    calendarDays.appendChild(dayElement);
+}
 }
 
 // Navigation buttons

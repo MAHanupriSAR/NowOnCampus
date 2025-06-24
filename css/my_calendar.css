@@ -447,6 +447,34 @@ body {
 }
 
 /* Calendar Popup Styles */
+/* Highlight for today */
+.calendar-day.today {
+    background: #3b82f6;
+    color: #fff;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+/* Light blue highlight on hover */
+.calendar-day:hover {
+    background: #e0f2fe;
+    color: #2563eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+.calendar-day.selected {
+    background: #bae6fd !important;  /* light blue */
+    color: #2563eb;
+    border-radius: 8px;
+    font-weight: bold;
+    box-shadow: 0 0 0 2px #38bdf833;
+}
+.calendar-day.today.selected {
+    /* If today is also selected, keep the today style dominant */
+    background: #3b82f6 !important;
+    color: #fff !important;
+}
 .calendar-popup {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
