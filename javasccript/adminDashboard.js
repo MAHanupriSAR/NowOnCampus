@@ -16,20 +16,20 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //Admin management
 // Show edit password form when edit button is clicked
+// Show Edit Admin Password Modal
 document.getElementById('admins-tbody').addEventListener('click', function(e) {
     if (e.target.closest('.action-btn.edit')) {
         const btn = e.target.closest('.action-btn.edit');
         const email = btn.getAttribute('data-email');
         document.getElementById('edit-admin-email').value = email;
-        document.getElementById('edit-admin-password-form').style.display = 'block';
+        document.getElementById('edit-admin-password-modal').style.display = 'flex';
     }
 });
 
-// Cancel button for edit password form
+// Hide Edit Admin Password Modal
 document.getElementById('edit-admin-password-cancel').addEventListener('click', () => {
-    const form = document.getElementById('edit-admin-password-form');
-    form.style.display = 'none';
-    form.reset();
+    document.getElementById('edit-admin-password-modal').style.display = 'none';
+    document.getElementById('edit-admin-password-form').reset();
 });
 
 // Handle edit password form submission
@@ -90,16 +90,15 @@ document.getElementById('admins-tbody').addEventListener('click', async function
     }
 });
 
-//cancel admin creation
-document.getElementById('create-admin-cancel').addEventListener('click', () => {
-    const form = document.getElementById('create-admin-form');
-    form.style.display = 'none';
-    form.reset();
-}); 
-// Toggle Create Admin form
+// Show Create Admin Modal
 document.getElementById('btn-create-admin').addEventListener('click', () => {
-    const form = document.getElementById('create-admin-form');
-    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    document.getElementById('create-admin-modal').style.display = 'flex';
+});
+
+// Hide Create Admin Modal
+document.getElementById('create-admin-cancel').addEventListener('click', () => {
+    document.getElementById('create-admin-modal').style.display = 'none';
+    document.getElementById('create-admin-form').reset();
 });
 
 // Handle form submission
@@ -209,21 +208,20 @@ async function loadStudents() {
 // Call loadStudents on page load
 document.addEventListener('DOMContentLoaded', loadStudents);
 
-// Show edit password form when edit button is clicked for students
+// Show Edit Student Password Modal
 document.getElementById('students-tbody').addEventListener('click', function(e) {
     if (e.target.closest('.action-btn.edit')) {
         const btn = e.target.closest('.action-btn.edit');
         const email = btn.getAttribute('data-email');
         document.getElementById('edit-student-email').value = email;
-        document.getElementById('edit-student-password-form').style.display = 'block';
+        document.getElementById('edit-student-password-modal').style.display = 'flex';
     }
 });
 
-// Cancel button for edit student password form
+// Hide Edit Student Password Modal
 document.getElementById('edit-student-password-cancel').addEventListener('click', () => {
-    const form = document.getElementById('edit-student-password-form');
-    form.style.display = 'none';
-    form.reset();
+    document.getElementById('edit-student-password-modal').style.display = 'none';
+    document.getElementById('edit-student-password-form').reset();
 });
 
 // Handle edit student password form submission
@@ -634,3 +632,14 @@ async function loadStats() {
     }
 }
 document.addEventListener('DOMContentLoaded', loadStats);
+
+// Allow closing any modal by clicking the overlay (outside the form)
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) {
+            overlay.style.display = 'none';
+            const form = overlay.querySelector('form');
+            if (form) form.reset();
+        }
+    });
+});

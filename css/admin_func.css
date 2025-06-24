@@ -689,3 +689,94 @@ body {
         margin: 1rem auto;
     }
 }
+
+/* Consistent Modal Overlay */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(30,41,59,0.18);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto;
+}
+
+/* Consistent Modal Form */
+.modal-form {
+    background: #fff;
+    border-radius: 14px;
+    padding: 2rem 2.5rem 1.5rem 2.5rem;
+    max-width: 420px;
+    min-width: 320px;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 8px 32px rgba(30,41,59,0.15);
+    position: relative;
+    text-align: left;
+    animation: popupIn 0.18s cubic-bezier(.4,0,.2,1);
+    margin: 2rem auto;
+    overflow-y: auto;
+    max-height: 90vh;
+}
+
+.modal-form h3 {
+    margin-top: 0;
+    margin-bottom: 1.2rem;
+    font-size: 1.3rem;
+    color: #3b82f6;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.modal-form label {
+    display: block;
+    margin-bottom: 0.7rem;
+    color: #1e293b;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.modal-form input,
+.modal-form textarea {
+    width: 100%;
+    padding: 0.5rem 0.7rem;
+    margin-top: 0.3rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 1rem;
+    background: #f8fafc;
+    transition: border 0.2s;
+    margin-bottom: 0.2rem;
+}
+
+.modal-form input:focus,
+.modal-form textarea:focus {
+    border-color: #3b82f6;
+    outline: none;
+}
+
+.modal-form button {
+    margin-top: 1rem;
+    margin-right: 0.7rem;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    border: none;
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+@media (max-width: 600px) {
+    .modal-form {
+        padding: 1rem 0.7rem 1rem 0.7rem;
+        min-width: 0;
+        max-width: 98vw;
+        width: 100%;
+        margin: 1rem auto;
+    }
+    .modal-form h3 {
+        font-size: 1.1rem;
+    }
+}

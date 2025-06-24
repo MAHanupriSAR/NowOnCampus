@@ -197,14 +197,17 @@
                         </button>
                     </div>
                     <!-- Add a hidden form for creating new admin -->
-                    <form id="create-admin-form" style="display: none; margin-bottom: 1rem;">
-                        <label>Name: <input type="text" id="admin-name" required></label>
-                        <label>Email: <input type="email" id="admin-email" required></label>
-                        <label>Password: <input type="password" id="admin-password" required></label>
-                        <label>Confirm: <input type="password" id="admin-confirm" required></label>
-                        <button class="btn" id="create-admin-submit" type="submit">Submit</button>
-                        <button class="btn" id="create-admin-cancel" type="button">Cancel</button>
-                    </form>
+                    <div id="create-admin-modal" class="modal-overlay" style="display:none;">
+                        <form id="create-admin-form" class="modal-form">
+                            <h3>Create Admin</h3>
+                            <label>Name: <input type="text" id="admin-name" required></label>
+                            <label>Email: <input type="email" id="admin-email" required></label>
+                            <label>Password: <input type="password" id="admin-password" required></label>
+                            <label>Confirm: <input type="password" id="admin-confirm" required></label>
+                            <button class="btn" id="create-admin-submit" type="submit">Submit</button>
+                            <button class="btn" id="create-admin-cancel" type="button">Cancel</button>
+                        </form>
+                    </div>
                     <div class="table-container">
                         <table class="data-table">
                             <thead>
@@ -234,13 +237,16 @@
                             </tbody>
                         </table>
                     </div>
-                    <form id="edit-admin-password-form" style="display:none; margin-bottom:1rem;">
-                        <input type="hidden" id="edit-admin-email">
-                        <label>New Password: <input type="password" id="edit-admin-password" required></label>
-                        <label>Confirm Password: <input type="password" id="edit-admin-confirm" required></label>
-                        <button class="btn" id="edit-admin-password-submit" type="submit">Update</button>
-                        <button class="btn" id="edit-admin-password-cancel" type="button">Cancel</button>
-                    </form>
+                    <div id="edit-admin-password-modal" class="modal-overlay" style="display:none;">
+                        <form id="edit-admin-password-form" class="modal-form">
+                            <h3>Edit Admin Password</h3>
+                            <input type="hidden" id="edit-admin-email">
+                            <label>New Password: <input type="password" id="edit-admin-password" required></label>
+                            <label>Confirm Password: <input type="password" id="edit-admin-confirm" required></label>
+                            <button class="btn" id="edit-admin-password-submit" type="submit">Update</button>
+                            <button class="btn" id="edit-admin-password-cancel" type="button">Cancel</button>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- Student Management Tab -->
@@ -277,13 +283,17 @@
                             </tbody>
                         </table>
                     </div>
-                    <form id="edit-student-password-form" style="display:none; margin-bottom:1rem;">
-                        <input type="hidden" id="edit-student-email">
-                        <label>New Password: <input type="password" id="edit-student-password" required></label>
-                        <label>Confirm Password: <input type="password" id="edit-student-confirm" required></label>
-                        <button class="btn" id="edit-student-password-submit" type="submit">Update</button>
-                        <button class="btn" id="edit-student-password-cancel" type="button">Cancel</button>
-                    </form>
+                    <!-- Edit Student Password Modal -->
+                    <div id="edit-student-password-modal" class="modal-overlay" style="display:none;">
+                        <form id="edit-student-password-form" class="modal-form">
+                            <h3>Edit Student Password</h3>
+                            <input type="hidden" id="edit-student-email">
+                            <label>New Password: <input type="password" id="edit-student-password" required></label>
+                            <label>Confirm Password: <input type="password" id="edit-student-confirm" required></label>
+                            <button class="btn" id="edit-student-password-submit" type="submit">Update</button>
+                            <button class="btn" id="edit-student-password-cancel" type="button">Cancel</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
