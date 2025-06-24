@@ -511,3 +511,181 @@ body {
         font-size: 0.7rem;
     }
 }
+
+/* Popup Modal Overlay */
+#create-event-modal,
+#edit-event-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(30,41,59,0.18);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Popup Form Content */
+#create-event-form,
+#edit-event-form {
+    background: #fff;
+    border-radius: 14px;
+    padding: 2rem 2.5rem 1.5rem 2.5rem;
+    max-width: 420px;
+    min-width: 320px;
+    box-shadow: 0 8px 32px rgba(30,41,59,0.15);
+    position: relative;
+    text-align: left;
+    animation: popupIn 0.18s cubic-bezier(.4,0,.2,1);
+    margin: auto;
+}
+
+@keyframes popupIn {
+    from { transform: translateY(30px) scale(0.98); opacity: 0; }
+    to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+#create-event-form h3,
+#edit-event-form h3 {
+    margin-top: 0;
+    margin-bottom: 1.2rem;
+    font-size: 1.3rem;
+    color: #3b82f6;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+#create-event-form label,
+#edit-event-form label {
+    display: block;
+    margin-bottom: 0.7rem;
+    color: #1e293b;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+#create-event-form input,
+#create-event-form textarea,
+#create-event-form select,
+#edit-event-form input,
+#edit-event-form textarea,
+#edit-event-form select {
+    width: 100%;
+    padding: 0.5rem 0.7rem;
+    margin-top: 0.3rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 1rem;
+    background: #f8fafc;
+    transition: border 0.2s;
+    margin-bottom: 0.2rem;
+}
+
+#create-event-form input:focus,
+#create-event-form textarea:focus,
+#create-event-form select:focus,
+#edit-event-form input:focus,
+#edit-event-form textarea:focus,
+#edit-event-form select:focus {
+    border-color: #3b82f6;
+    outline: none;
+}
+
+#create-event-form textarea,
+#edit-event-form textarea {
+    min-height: 60px;
+    resize: vertical;
+}
+
+#create-event-form button,
+#edit-event-form button {
+    margin-top: 1rem;
+    margin-right: 0.7rem;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    border: none;
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+#create-event-submit,
+#edit-event-submit {
+    background: #3b82f6;
+    color: #fff;
+}
+
+#create-event-submit:hover,
+#edit-event-submit:hover {
+    background: #2563eb;
+}
+
+#create-event-cancel,
+#edit-event-cancel {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+#create-event-cancel:hover,
+#edit-event-cancel:hover {
+    background: #e0e7ef;
+    color: #3b82f6;
+}
+
+@media (max-width: 600px) {
+    #create-event-form,
+    #edit-event-form {
+        padding: 1rem 0.7rem 1rem 0.7rem;
+        min-width: 0;
+        max-width: 98vw;
+    }
+    #create-event-form h3,
+    #edit-event-form h3 {
+        font-size: 1.1rem;
+    }
+}
+
+/* Ensure modal overlay uses flex for centering */
+#create-event-modal,
+#edit-event-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(30,41,59,0.18);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    /* Add this for mobile scrolling support */
+    overflow-y: auto;
+}
+
+/* Make popup content responsive and scrollable if needed */
+#create-event-form,
+#edit-event-form {
+    background: #fff;
+    border-radius: 14px;
+    padding: 2rem 2.5rem 1.5rem 2.5rem;
+    max-width: 98vw;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 8px 32px rgba(30,41,59,0.15);
+    position: relative;
+    text-align: left;
+    animation: popupIn 0.18s cubic-bezier(.4,0,.2,1);
+    margin: 2rem auto; /* add margin for top/bottom breathing room */
+    overflow-y: auto;
+    max-height: 90vh;   /* prevent overflow off screen */
+}
+
+@media (max-width: 600px) {
+    #create-event-form,
+    #edit-event-form {
+        padding: 1rem 0.7rem 1rem 0.7rem;
+        min-width: 0;
+        max-width: 98vw;
+        width: 100%;
+        margin: 1rem auto;
+    }
+}
