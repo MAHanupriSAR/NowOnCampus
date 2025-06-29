@@ -55,7 +55,12 @@ NowOnCampus is a full-stack web application for managing and discovering campus 
 
 ## Screenshots
 
-_Add screenshots of the home page, event details, calendar, and admin dashboard here._
+![Home](screenshots/home.png)
+![events](screenshots/events.png)
+![admin_eventManagement](screenshots/admin_eventManagement.png)
+![admin_adminManagement](screenshots/admin_adminManagement.png)
+![admin_studentManagement](screenshots/admin_studentManagement.png)
+![calender](screenshots/calender.png)
 
 ## License
 
