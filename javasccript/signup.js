@@ -64,8 +64,8 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
             email,
             password
         })
-    }).then(function(response){
-        if (response.ok) {
+    }).then(function(data){
+        if (data.ok) {
             alert('Registration successful! Redirecting to login...');
             window.location.href = 'login.html';
         } else {

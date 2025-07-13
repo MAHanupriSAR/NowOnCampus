@@ -44,3 +44,6 @@ CREATE TABLE events (
 
 create table register(user_id INT, event_id INT);
 create table wishlist(user_id INT, event_id INT);
+
+INSERT INTO users (name, email, password, isAdmin)
+VALUES ('admin', 'admin@gmail.com', 'admin', 1);

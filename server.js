@@ -1,3 +1,5 @@
+require('dotenv').config();
+const nodemailer = require('nodemailer');
 const express = require('express');
 const mysql = require('mysql2');
 const bodyParser = require('body-parser');
@@ -8,6 +10,15 @@ const saltRounds = 10;
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
+
+// Email configuration
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS
+  }
+});
 
 const db = mysql.createConnection({
   host: 'localhost',
@@ -26,6 +37,35 @@ db.connect(err => {
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // Signup endpoint
+// app.post('/signup', async (req, res) => {
+//   const { firstName, lastName, email, password } = req.body;
+  
+//   try {
+//     // Check if email already exists
+//     const [existingUsers] = await db.promise().query(
+//       'SELECT * FROM users WHERE email = ?',
+//       [email]
+//     );
+    
+//     if (existingUsers.length > 0) {
+//       return res.status(400).json({ error: 'Email already in use' });
+//     }
+    
+//     // Hash password
+//     const hashedPassword = await bcrypt.hash(password, saltRounds);
+    
+//     // Insert new user
+//     const [result] = await db.promise().query(
+//       'INSERT INTO users (name, email, password, isAdmin) VALUES (?, ?, ?, ?)',
+//       [`${firstName} ${lastName}`, email, hashedPassword, 0]
+//     );
+    
+//     res.status(201).json({ message: 'User registered successfully' });
+//   } catch (error) {
+//     console.error('Registration error:', error);
+//     res.status(500).json({ error: 'Registration failed' });
+//   }
+// });
 app.post('/signup', async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
   
@@ -49,12 +89,39 @@ app.post('/signup', async (req, res) => {
       [`${firstName} ${lastName}`, email, hashedPassword, 0]
     );
     
-    res.status(201).json({ message: 'User registered successfully' });
+    // Send confirmation email
+    const mailOptions = {
+      from: 'your-email@gmail.com', // Replace with your Gmail
+      to: email,
+      subject: 'Welcome to NowOnCampus - Registration Successful!',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #333;">Welcome to NowOnCampus!</h2>
+          <p>Dear ${firstName} ${lastName},</p>
+          <p>Thank you for registering with NowOnCampus! Your account has been successfully created.</p>
+          <p>Here are your account details:</p>
+          <ul>
+            <li><strong>Name:</strong> ${firstName} ${lastName}</li>
+            <li><strong>Email:</strong> ${email}</li>
+          </ul>
+          <p>You can now log in to your account and start exploring campus events and activities.</p>
+          <p>If you have any questions, please don't hesitate to contact us.</p>
+          <br>
+          <p>Best regards,<br>The NowOnCampus Team</p>
+        </div>
+      `
+    };
+    
+    // Send email
+    await transporter.sendMail(mailOptions);
+    
+    res.status(201).json({ message: 'User registered successfully. Check your email for confirmation!' });
   } catch (error) {
     console.error('Registration error:', error);
     res.status(500).json({ error: 'Registration failed' });
   }
 });
+
 
 // Login endpoint
 app.post('/login', async (req, res) => {
