@@ -169,6 +169,27 @@ app.post('/login', async (req, res) => {
 //////////////////////////////////////////////////////////////////////////////////////////////////
 //Admin Management
 // Create Admin endpoint
+// app.post('/createAdmin', async (req, res) => {
+//   const { name, email, password } = req.body;
+//   try {
+//     const [existingUsers] = await db.promise().query(
+//       'SELECT * FROM users WHERE email = ?',
+//       [email]
+//     );
+//     if (existingUsers.length > 0) {
+//       return res.status(400).json({ error: 'Email already in use' });
+//     }
+//     const hashedPassword = await bcrypt.hash(password, saltRounds);
+//     await db.promise().query(
+//       'INSERT INTO users (name, email, password, isAdmin) VALUES (?, ?, ?, ?)',
+//       [name, email, hashedPassword, 1]
+//     );
+//     res.status(201).json({ message: 'Admin created successfully' });
+//   } catch (error) {
+//     console.error('Create admin error:', error);
+//     res.status(500).json({ error: 'Failed to create admin' });
+//   }
+// }); 
 app.post('/createAdmin', async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -184,7 +205,113 @@ app.post('/createAdmin', async (req, res) => {
       'INSERT INTO users (name, email, password, isAdmin) VALUES (?, ?, ?, ?)',
       [name, email, hashedPassword, 1]
     );
-    res.status(201).json({ message: 'Admin created successfully' });
+
+    // Send welcome email to the newly created admin
+    const mailOptions = {
+      from: process.env.GMAIL_USER || 'your-email@gmail.com',
+      to: email,
+      subject: 'Welcome to NowOnCampus - Admin Account Created!',
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          <div style="background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%); color: white; padding: 2rem; text-align: center;">
+            <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">
+              <span style="margin-right: 8px; color: #fbbf24;">👨‍��</span>NowOnCampus
+            </div>
+            <div style="font-size: 0.9rem; opacity: 0.9;">Admin Account Created Successfully</div>
+          </div>
+          
+          <div style="padding: 2rem; color: #374151; line-height: 1.6;">
+            <div style="font-size: 1.1rem; font-weight: 600; color: #1f2937; margin-bottom: 1rem;">
+              Welcome ${name}!
+            </div>
+            
+            <div style="margin-bottom: 1.5rem; color: #6b7280;">
+              Your admin account has been successfully created on NowOnCampus. You now have administrative privileges to manage the platform.
+            </div>
+            
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;">
+              <div style="font-size: 1.1rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">
+                Account Details
+              </div>
+              
+              <div style="display: flex; align-items: center; margin-bottom: 0.75rem; font-size: 0.9rem;">
+                <span style="width: 20px; margin-right: 0.75rem; color: #1e40af; text-align: center;">👤</span>
+                <span style="font-weight: 600; color: #374151; min-width: 80px;">Name:</span>
+                <span style="color: #6b7280; flex: 1;">${name}</span>
+              </div>
+              
+              <div style="display: flex; align-items: center; margin-bottom: 0.75rem; font-size: 0.9rem;">
+                <span style="width: 20px; margin-right: 0.75rem; color: #1e40af; text-align: center;">📧</span>
+                <span style="font-weight: 600; color: #374151; min-width: 80px;">Email:</span>
+                <span style="color: #6b7280; flex: 1;">${email}</span>
+              </div>
+              
+              <div style="display: flex; align-items: center; margin-bottom: 0.75rem; font-size: 0.9rem;">
+                <span style="width: 20px; margin-right: 0.75rem; color: #1e40af; text-align: center;">🔐</span>
+                <span style="font-weight: 600; color: #374151; min-width: 80px;">Role:</span>
+                <span style="color: #6b7280; flex: 1;">Administrator</span>
+              </div>
+              
+              <div style="display: flex; align-items: center; margin-bottom: 0.75rem; font-size: 0.9rem;">
+                <span style="width: 20px; margin-right: 0.75rem; color: #1e40af; text-align: center;">📅</span>
+                <span style="font-weight: 600; color: #374151; min-width: 80px;">Created:</span>
+                <span style="color: #6b7280; flex: 1;">${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+              </div>
+            </div>
+            
+            <div style="background: #eff6ff; border: 1px solid #dbeafe; border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;">
+              <div style="font-size: 1rem; font-weight: 600; color: #1e40af; margin-bottom: 1rem;">
+                �� Your Admin Privileges
+              </div>
+              <ul style="margin: 0; padding-left: 1.5rem; color: #374151; font-size: 0.9rem;">
+                <li style="margin-bottom: 0.5rem;">Create, edit, and delete campus events</li>
+                <li style="margin-bottom: 0.5rem;">Manage student and admin accounts</li>
+                <li style="margin-bottom: 0.5rem;">Reset user passwords</li>
+                <li style="margin-bottom: 0.5rem;">View and manage event registrations</li>
+                <li style="margin-bottom: 0.5rem;">Access comprehensive admin dashboard</li>
+                <li style="margin-bottom: 0.5rem;">Monitor platform statistics</li>
+              </ul>
+            </div>
+            
+            <div style="text-align: center; margin: 2rem 0;">
+              <a href="http://localhost:3000/html/admin_func.html" style="display: inline-block; background: #1e40af; color: white; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 6px; font-weight: 600; font-size: 0.9rem;">
+                Access Admin Dashboard
+              </a>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem; color: #6b7280; font-size: 0.9rem;">
+              <strong>Next Steps:</strong>
+              <ol style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                <li style="margin-bottom: 0.5rem;">Log in to your admin account using your email and password</li>
+                <li style="margin-bottom: 0.5rem;">Explore the admin dashboard to familiarize yourself with the tools</li>
+                <li style="margin-bottom: 0.5rem;">Start creating and managing campus events</li>
+                <li style="margin-bottom: 0.5rem;">Monitor student registrations and platform activity</li>
+              </ol>
+            </div>
+            
+            <div style="background: #fef3c7; border: 1px solid #fde68a; border-radius: 6px; padding: 1rem; margin: 1.5rem 0; font-size: 0.9rem; color: #92400e;">
+              <strong>🔒 Security Note:</strong> Please keep your login credentials secure and never share them with others. If you suspect any unauthorized access, contact the system administrator immediately.
+            </div>
+          </div>
+          
+          <div style="background: #f9fafb; padding: 1.5rem 2rem; text-align: center; border-top: 1px solid #e5e7eb;">
+            <div style="color: #6b7280; font-size: 0.85rem; margin-bottom: 0.5rem;">
+              Welcome to the NowOnCampus Admin Team!
+            </div>
+            <div style="margin-top: 0.5rem;">
+              <a href="http://localhost:3000/html/home.html" style="color: #1e40af; text-decoration: none; font-size: 0.85rem; margin: 0 0.5rem;">Home</a>
+              <a href="http://localhost:3000/html/admin_func.html" style="color: #1e40af; text-decoration: none; font-size: 0.85rem; margin: 0 0.5rem;">Admin Dashboard</a>
+              <a href="http://localhost:3000/html/about.html" style="color: #1e40af; text-decoration: none; font-size: 0.85rem; margin: 0 0.5rem;">About</a>
+            </div>
+          </div>
+        </div>
+      `
+    };
+    
+    // Send email
+    await transporter.sendMail(mailOptions);
+    
+    res.status(201).json({ message: 'Admin created successfully. Welcome email sent!' });
   } catch (error) {
     console.error('Create admin error:', error);
     res.status(500).json({ error: 'Failed to create admin' });
@@ -558,6 +685,7 @@ app.post('/registerEvent', async (req, res) => {
 //     res.status(500).json({ error: 'Failed to fetch registered events' });
 //   }
 // });
+
 app.get('/userRegisteredEvents', async (req, res) => {
   const { user_id } = req.query;
   try {
