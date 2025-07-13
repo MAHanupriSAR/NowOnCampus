@@ -411,11 +411,141 @@ app.post('/registerEvent', async (req, res) => {
     const [rows] = await db.promise().query('SELECT * FROM register WHERE user_id = ? AND event_id = ?', [user_id, event_id]);
     if (rows.length > 0) return res.status(400).json({ error: 'Already registered' });
 
+    // Get user details
+    const [users] = await db.promise().query('SELECT * FROM users WHERE id = ?', [user_id]);
+    if (users.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const user = users[0];
+
+    // Get event details
+    const [events] = await db.promise().query('SELECT * FROM events WHERE event_id = ?', [event_id]);
+    if (events.length === 0) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+    const event = events[0];
+
+    // Register for event
     await db.promise().query('INSERT INTO register (user_id, event_id) VALUES (?, ?)', [user_id, event_id]);
     // Optionally increment registrations count in events table
     await db.promise().query('UPDATE events SET registrations = registrations + 1 WHERE event_id = ?', [event_id]);
-    res.json({ message: 'Registered successfully' });
+
+    // Send confirmation email
+    const mailOptions = {
+      from: process.env.GMAIL_USER || 'your-email@gmail.com',
+      to: user.email,
+      subject: `Event Registration Confirmation - ${event.event_name}`,
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 2rem; text-align: center;">
+            <div style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">
+              <span style="margin-right: 8px; color: #fbbf24;">��</span>NowOnCampus
+            </div>
+            <div style="font-size: 0.9rem; opacity: 0.9;">Event Registration Confirmation</div>
+          </div>
+          
+          <div style="padding: 2rem; color: #374151; line-height: 1.6;">
+            <div style="font-size: 1.1rem; font-weight: 600; color: #1f2937; margin-bottom: 1rem;">
+              Hello ${user.name}!
+            </div>
+            
+            <div style="margin-bottom: 1.5rem; color: #6b7280;">
+              Thank you for registering for the event! Your registration has been confirmed. Here are the event details:
+            </div>
+            
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0;">
+              <div style="font-size: 1.2rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem;">
+                ${event.event_name}
+              </div>
+              
+              <div style="display: flex; align-items: center; margin-bottom: 0.75rem; font-size: 0.9rem;">
+                <span style="width: 20px; margin-right: 0.75rem; color: #3b82f6; text-align: center;">📅</span>
+                <span style="font-weight: 600; color: #374151; min-width: 80px;">Date & Time:</span>
+                <span style="color: #6b7280; flex: 1;">${new Date(event.start_datetime).toLocaleDateString()} at ${new Date(event.start_datetime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${new Date(event.end_datetime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+              </div>
+              
+              <div style="display: flex; align-items: center; margin-bottom: 0.75rem; font-size: 0.9rem;">
+                <span style="width: 20px; margin-right: 0.75rem; color: #3b82f6; text-align: center;">📍</span>
+                <span style="font-weight: 600; color: #374151; min-width: 80px;">Venue:</span>
+                <span style="color: #6b7280; flex: 1;">${event.venue}</span>
+              </div>
+              
+              <div style="display: flex; align-items: center; margin-bottom: 0.75rem; font-size: 0.9rem;">
+                <span style="width: 20px; margin-right: 0.75rem; color: #3b82f6; text-align: center;">🏷️</span>
+                <span style="font-weight: 600; color: #374151; min-width: 80px;">Type:</span>
+                <span style="color: #6b7280; flex: 1;">${event.event_type || 'General'}</span>
+              </div>
+              
+              <div style="display: flex; align-items: center; margin-bottom: 0.75rem; font-size: 0.9rem;">
+                <span style="width: 20px; margin-right: 0.75rem; color: #3b82f6; text-align: center;">🏢</span>
+                <span style="font-weight: 600; color: #374151; min-width: 80px;">Department:</span>
+                <span style="color: #6b7280; flex: 1;">${event.department || 'All Departments'}</span>
+              </div>
+              
+              <div style="display: flex; align-items: center; margin-bottom: 0.75rem; font-size: 0.9rem;">
+                <span style="width: 20px; margin-right: 0.75rem; color: #3b82f6; text-align: center;">👤</span>
+                <span style="font-weight: 600; color: #374151; min-width: 80px;">Organizer:</span>
+                <span style="color: #6b7280; flex: 1;">${event.organiser_name || 'Not specified'}</span>
+              </div>
+              
+              <div style="display: flex; align-items: center; margin-bottom: 0.75rem; font-size: 0.9rem;">
+                <span style="width: 20px; margin-right: 0.75rem; color: #3b82f6; text-align: center;">📊</span>
+                <span style="font-weight: 600; color: #374151; min-width: 80px;">Status:</span>
+                <span style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; background: ${event.event_status === 'upcoming' ? '#dbeafe' : event.event_status === 'ongoing' ? '#fef3c7' : event.event_status === 'past' ? '#f3f4f6' : '#fee2e2'}; color: ${event.event_status === 'upcoming' ? '#1e40af' : event.event_status === 'ongoing' ? '#92400e' : event.event_status === 'past' ? '#374151' : '#991b1b'};">${event.event_status}</span>
+              </div>
+              
+              ${event.description ? `
+              <div style="background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 1rem; margin-top: 1rem; font-size: 0.9rem; color: #4b5563; line-height: 1.5;">
+                <strong>Description:</strong><br>
+                ${event.description}
+              </div>
+              ` : ''}
+              
+              ${event.agenda ? `
+              <div style="background: white; border: 1px solid #e5e7eb; border-radius: 6px; padding: 1rem; margin-top: 1rem; font-size: 0.9rem; color: #4b5563; line-height: 1.5;">
+                <strong>Agenda:</strong><br>
+                ${event.agenda}
+              </div>
+              ` : ''}
+            </div>
+            
+            <div style="text-align: center; margin: 2rem 0;">
+              <a href="http://localhost:3000/html/event_details.html?id=${event.event_id}" style="display: inline-block; background: #3b82f6; color: white; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 6px; font-weight: 600; font-size: 0.9rem;">
+                View Event Details
+              </a>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem; color: #6b7280; font-size: 0.9rem;">
+              <strong>Important Notes:</strong>
+              <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                <li>Please arrive 10-15 minutes before the event starts</li>
+                <li>Bring any required materials or documents</li>
+                <li>Check your email for any updates or changes</li>
+                <li>Contact the organizer if you have any questions</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div style="background: #f9fafb; padding: 1.5rem 2rem; text-align: center; border-top: 1px solid #e5e7eb;">
+            <div style="color: #6b7280; font-size: 0.85rem; margin-bottom: 0.5rem;">
+              Thank you for using NowOnCampus!
+            </div>
+            <div style="margin-top: 0.5rem;">
+              <a href="http://localhost:3000/html/home.html" style="color: #3b82f6; text-decoration: none; font-size: 0.85rem; margin: 0 0.5rem;">Home</a>
+              <a href="http://localhost:3000/html/events.html" style="color: #3b82f6; text-decoration: none; font-size: 0.85rem; margin: 0 0.5rem;">Events</a>
+              <a href="http://localhost:3000/html/about.html" style="color: #3b82f6; text-decoration: none; font-size: 0.85rem; margin: 0 0.5rem;">About</a>
+            </div>
+          </div>
+        </div>
+      `
+    };
+    
+    // Send email
+    await transporter.sendMail(mailOptions);
+    
+    res.json({ message: 'Registered successfully. Check your email for confirmation!' });
   } catch (error) {
+    console.error('Registration error:', error);
     res.status(500).json({ error: 'Failed to register' });
   }
 });
