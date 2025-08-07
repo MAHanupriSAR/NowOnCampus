@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Annual Tech Symposium 2024 - NowOnCampus</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="../css/event_details.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav container">
+            <div class="logo">
+                <i class="fas fa-graduation-cap logo-icon"></i>
+                NowOnCampus
+            </div>
+            <ul class="nav-menu">
+                <li><a href="home.html" class="nav-link">
+                    <i class="fas fa-home nav-icon"></i>
+                    Home
+                </a></li>
+                <li><a href="events.html" class="nav-link active">
+                    <i class="fas fa-calendar-alt nav-icon"></i>
+                    Events
+                </a></li>
+                <!-- <li><a href="calendar.html" class="nav-link">
+                    <i class="fas fa-calendar-check nav-icon"></i>
+                    My Calendar
+                </a></li>
+                <li><a href="admin_func.html" class="nav-link">
+                    <i class="fas fa-cog nav-icon"></i>
+                    Admin
+                </a></li> -->
+                <li><a href="about.html" class="nav-link">
+                    <i class="fas fa-info-circle nav-icon"></i>
+                    About
+                </a></li>
+            </ul>
+            <div id="auth-nav-section"></div>
+        </nav>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="events.html" class="back-link">
+                    <i class="fas fa-arrow-left back-icon"></i>
+                    Back to Events
+                </a>
+            </div>
+
+            <div class="event-hero">
+                <div class="hero-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+            </div>
+
+            <div class="event-card">
+                <div class="event-header">
+                    <div class="event-status">
+                        <span class="status-badge upcoming" id="event-status">
+                            <!-- status of event will be displayed here -->
+                        </span>
+                    </div>
+                    <h1 class="event-title" id="event-title"></h1>
+
+                    <div class="event-meta">
+                        <div class="meta-row">
+                            <div class="meta-item">
+                                <i class="fas fa-calendar-alt meta-icon"></i>
+                                <span class="meta-label">Start:</span>
+                                <span class="meta-value" id="event-start"></span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-calendar-alt meta-icon"></i>
+                                <span class="meta-label">End:</span>
+                                <span class="meta-value" id="event-end"></span>
+                            </div>
+                        </div>
+                        <div class="meta-row">
+                            <div class="meta-item">
+                                <i class="fas fa-map-marker-alt meta-icon"></i>
+                                <span class="meta-label">Location:</span>
+                                <span class="meta-value" id="event-venue"></span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-user-tie meta-icon"></i>
+                                <span class="meta-label">Organizer:</span>
+                                <span class="meta-value" id="event-organiser"></span>
+                            </div>
+                        </div>
+                        <div class="meta-row">
+                            <div class="meta-item">
+                                <i class="fas fa-users meta-icon"></i>
+                                <span class="meta-label">Department:</span>
+                                <span class="meta-value" id="event-department"></span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-user-friends meta-icon"></i>
+                                <span class="meta-label">Registrations:</span>
+                                <span class="meta-value" id="event-registrations"></span>
+                            </div>
+                        </div>
+                        <div class="meta-row">
+                            <div class="meta-item">
+                                <i class="fas fa-user-friends meta-icon"></i>
+                                <span class="meta-label">Capacity:</span>
+                                <span class="meta-value" id="event-capacity"></span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-user-friends meta-icon"></i>
+                                <span class="meta-label">Type:</span>
+                                <span class="meta-value" id="event-type"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="event-actions">
+                        <button class="btn-primary" id="register-btn">
+                            <i class="fas fa-user-plus btn-icon"></i>
+                            Register Now
+                        </button>
+                        <button class="btn-secondary" id="wishlist-btn">
+                            <i class="fas fa-heart btn-icon"></i>
+                            Add to Wishlist
+                        </button>
+                        <!-- <button class="btn-secondary">
+                            <i class="fas fa-calendar-plus btn-icon"></i>
+                            Add to Calendar
+                        </button> -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-content">
+                <div class="content-main">
+                    <section class="about-section">
+                        <h2 class="section-title">About This Event</h2>
+                        <div class="about-text" id="event-description"></div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src = "../javasccript/event_details.js"></script>
+    <script src = "../javasccript/main.js"></script>
+</body>
+</html>
