@@ -32,31 +32,31 @@ const currentUserId = user.id;
 //         const emptyDay = document.createElement('div');
 //         emptyDay.className = 'calendar-day empty';
 //         calendarDays.appendChild(emptyDay);
-//     }
+    // }
 
-//     // Add days of the month
-//     for (let day = 1; day <= daysInMonth; day++) {
-//         const dayElement = document.createElement('div');
-//         dayElement.className = 'calendar-day';
-//         dayElement.textContent = day;
+    // // Add days of the month
+    // for (let day = 1; day <= daysInMonth; day++) {
+    //     const dayElement = document.createElement('div');
+    //     dayElement.className = 'calendar-day';
+    //     dayElement.textContent = day;
 
-//         const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    //     const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         
-//         if (events[dateKey]) {
-//             dayElement.classList.add('has-event');
-//         }
+    //     if (events[dateKey]) {
+    //         dayElement.classList.add('has-event');
+    //     }
 
-//         if (day === 15 && month === 5 && year === 2025) {
-//             dayElement.classList.add('selected');
-//         }
+    //     if (day === 15 && month === 5 && year === 2025) {
+    //         dayElement.classList.add('selected');
+    //     }
 
-//         dayElement.addEventListener('click', () => {
-//             document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
-//             dayElement.classList.add('selected');
-//         });
+    //     dayElement.addEventListener('click', () => {
+    //         document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+    //         dayElement.classList.add('selected');
+    //     });
 
-//         calendarDays.appendChild(dayElement);
-//     }
+    //     calendarDays.appendChild(dayElement);
+    // }
 // }
 function getDatesBetween(start, end) {
     const dates = [];
@@ -445,3 +445,176 @@ document.querySelector('#wishlist-tab .events-list').addEventListener('click', a
         }
     }
 });
+
+// Show note modal when a date is clicked
+document.addEventListener('DOMContentLoaded', function() {
+    let selectedDate = null;
+
+    document.getElementById('calendarDays').addEventListener('click', function(e) {
+        const dayEl = e.target.closest('.calendar-day');
+        if (!dayEl || dayEl.classList.contains('empty')) return;
+        // Get selected date
+        const day = dayEl.textContent;
+        const month = currentMonth + 1;
+        const year = currentYear;
+        selectedDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        document.getElementById('note-modal-date').textContent = selectedDate;
+        document.getElementById('note-modal-text').value = '';
+        document.getElementById('note-modal-time').value = '';
+        document.getElementById('note-modal-msg').textContent = '';
+        document.getElementById('note-modal').style.display = 'flex';
+    });
+
+    // Close modal
+    document.getElementById('note-modal-close').onclick = function() {
+        document.getElementById('note-modal').style.display = 'none';
+    };
+    document.getElementById('note-modal').onclick = function(e) {
+        if (e.target === this) this.style.display = 'none';
+    };
+
+    // Handle note submission
+    document.getElementById('note-modal-form').onsubmit = async function(e) {
+        e.preventDefault();
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const userId = user.id;
+        const note = document.getElementById('note-modal-text').value.trim();
+        const time = document.getElementById('note-modal-time').value;
+        const msg = document.getElementById('note-modal-msg');
+        if (!userId) {
+            msg.textContent = 'You must be logged in to add notes.';
+            msg.style.color = 'red';
+            return;
+        }
+        if (!note || !time || !selectedDate) {
+            msg.textContent = 'All fields are required.';
+            msg.style.color = 'red';
+            return;
+        }
+        // Combine date and time
+        const datetime = `${selectedDate}T${time}:00`;
+        const res = await fetch('http://localhost:3000/api/notes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, note, datetime })
+        });
+        const data = await res.json();
+        if (data.success) {
+            msg.textContent = 'Note added!';
+            msg.style.color = 'green';
+            document.getElementById('note-modal').style.display = 'none';
+            showNotesOnCalendar(); // <-- This will render the note on the calendar
+        } else {
+            msg.textContent = 'Failed to add note.';
+            msg.style.color = 'red';
+        }
+    };
+});
+
+// After rendering your calendar grid, fetch and display notes:
+async function showNotesOnCalendar() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const userId = user.id;
+    if (!userId) return;
+
+    // Fetch notes for this user
+    const res = await fetch(`http://localhost:3000/api/notes/${userId}`);
+    const notes = await res.json();
+
+    // Remove previous notes from calendar
+    document.querySelectorAll('.calendar-note').forEach(el => el.remove());
+
+    notes.forEach(note => {
+        // Format date as YYYY-MM-DD
+        const dateStr = note.datetime.slice(0, 10);
+        const timeStr = new Date(note.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        // Find the cell for this date
+        const cell = document.querySelector(`.calendar-day[data-date="${dateStr}"]`);
+        if (cell) {
+            // Create a note element
+            const noteDiv = document.createElement('div');
+            noteDiv.className = 'calendar-note';
+            noteDiv.innerHTML = `<span class="note-time">${timeStr}</span>: <span class="note-text">${note.note}</span>`;
+            cell.appendChild(noteDiv);
+        }
+    });
+}
+
+// Call this after your calendar grid is rendered
+document.addEventListener('DOMContentLoaded', function() {
+    // ...your calendar rendering code...
+    showNotesOnCalendar();
+});
+async function showNotesList() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const userId = user.id;
+    if (!userId) return;
+
+    const res = await fetch(`http://localhost:3000/api/notes/${userId}`);
+    let notes = await res.json();
+
+    // Filter: only show notes with datetime >= now
+    const now = new Date();
+    notes = notes.filter(note => new Date(note.datetime) >= now);
+
+    // Sort notes by date descending (latest first)
+    notes.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+
+    const notesList = document.getElementById('notes-list');
+    if (!notes.length) {
+        notesList.innerHTML = `<tr><td colspan="4" style="text-align:center;">No notes yet.</td></tr>`;
+        return;
+    }
+    notesList.innerHTML = notes.map(note => {
+        const dateStr = note.datetime.slice(0, 10);
+        const timeStr = new Date(note.datetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return `<tr data-note-id="${note.id}">
+            <td class="note-date">${dateStr}</td>
+            <td class="note-time">${timeStr}</td>
+            <td class="note-text">${note.note}</td>
+            <td>
+                <button class="delete-note-btn" data-note-id="${note.id}">Delete</button>
+            </td>
+        </tr>`;
+    }).join('');
+
+    // Attach delete handlers
+    document.querySelectorAll('.delete-note-btn').forEach(btn => {
+        btn.onclick = async function() {
+            const noteId = this.getAttribute('data-note-id');
+            try {
+                const res = await fetch(`http://localhost:3000/api/notes/${noteId}`, {
+                    method: 'DELETE'
+                });
+                const data = await res.json();
+                console.log('Delete response:', data); // <-- Debug log
+                if (res.ok && (data.success || data.deleted || data.status === 'ok')) {
+                    showNotesList(); // Refresh notes
+                } else {
+                    alert(data.error || 'Failed to delete note.');
+                }
+            } catch (err) {
+                alert('Server error');
+            }
+        };
+    });
+}
+
+// Call this after adding/deleting a note and on page load
+document.addEventListener('DOMContentLoaded', function() {
+    showNotesList();
+    // ...other calendar code...
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const calendarInput = document.getElementById('your-calendar-input-id'); // Replace with your input's ID
+    if (calendarInput) {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        calendarInput.value = `${yyyy}-${mm}-${dd}`;
+    }
+});
+
